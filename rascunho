@@ -1,0 +1,293 @@
+# atualizar fronts
+                    fast_nondominated_sort = self.mod.get_function("fast_nondominated_sort")
+                    fast_nondominated_sort(self.fitness_g, self.params.objectives_dim_g,
+                                           self.domination_counter_g, self.params.population_size_g,
+                                           self.params.otimizations_type_g, self.params.objectives_dim_g,
+                                           block=(16, 32, 1),
+                                           grid=(8, 4, 1))
+                    cuda.Context.synchronize()
+
+                    #teste
+                    teste_f = np.zeros(384 * 2, dtype=np.float32)
+                    cuda.memcpy_dtoh(teste_f, self.fitness_g)
+                    teste_f.shape = 384, 2
+                    teste_dc = np.zeros(385 * 385, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_dc, self.domination_counter_g)
+                    teste_dc.shape = 385, 385
+                    teste_dict[self.generation_count]['fit11'] = teste_f
+                    teste_dict[self.generation_count]['dc11'] = teste_dc
+
+                    fast_nondominated_sort2 = self.mod.get_function("fast_nondominated_sort2")
+                    fast_nondominated_sort2(self.domination_counter_g, self.params.population_size_g,
+                                            self.params.population_size_g,
+                                            block=(self.params.population_size, 1, 1), grid=(1, 1, 1))
+                    cuda.Context.synchronize()
+
+                    #teste
+                    teste_dc = np.zeros(385 * 385, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_dc, self.domination_counter_g)
+                    teste_dc.shape = 385, 385
+                    teste_dict[self.generation_count]['dc12'] = teste_dc
+
+                    fast_nondominated_sort3 = self.mod.get_function("fast_nondominated_sort3")
+                    fast_nondominated_sort3(self.domination_counter_g, self.params.population_size_g,
+                                            self.params.population_size_g, self.fronts_g, self.tams_fronts_g,
+                                            self.rank_g,
+                                            block=(1, 1, 1), grid=(1, 1, 1))
+                    cuda.Context.synchronize()
+
+                    # teste
+                    teste_front = np.zeros(256, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_front, self.fronts_g)
+                    teste_dict[self.generation_count]['f11'] = teste_front
+                    tam_front = np.zeros(256, dtype=np.int32)
+                    cuda.memcpy_dtoh(tam_front, self.tams_fronts_g)
+                    teste_dict[self.generation_count]['tf11'] = tam_front
+                    pass
+
+                    # teste fronts
+                    # print("teste fronts")
+                    # f = []
+                    # for k in self.fronts:
+                    #     l2 = []
+                    #     for i in k:
+                    #         for j in range(len(self.population)):
+                    #             if self.population[j] == i:
+                    #                 l2.append(j)
+                    #                 break
+                    #     l2.sort()
+                    #     f.extend(l2)
+                    # teste_front = np.zeros(128, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste_front, self.fronts_g)
+                    # diff = teste_front-f
+                    # print(diff)
+                    # if self.generation_count==7:
+                    #     pass
+
+                    # teste
+                    # teste5 = np.zeros(128, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste5, self.fronts_g)
+                    # teste6 = np.zeros(128, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste6, self.front0_mem_g)
+                    # teste7 = np.zeros(1, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste7, self.tam_front0_mem_g)
+
+                    #teste nan
+                    # f_teste = open('testeNAN.pkl','wb')
+                    # dict2 = {}
+
+                    # atualiza memoria pela GPU
+                    inicialize_front0_mem = self.mod.get_function("inicialize_front0_mem")
+                    inicialize_front0_mem(self.fronts_g, self.front0_mem_g, self.tams_fronts_g,
+                                          self.tam_front0_mem_g, self.position_g, self.params.memory_size_g,
+                                          self.params.population_size_g,
+                                          self.params.position_dim_g, self.params.current_memory_size_g,
+                                          block=(1, 1, 1), grid=(1, 1, 1))
+                    cuda.Context.synchronize()
+
+                    #teste
+                    teste_cur = np.zeros(1, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_cur, self.params.current_memory_size_g)
+                    teste_dict[self.generation_count]['cur21'] = teste_cur
+                    teste2 = np.zeros(256, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste2, self.fronts_g)
+                    teste_dict[self.generation_count]['f21'] = teste2
+                    teste_tam = np.zeros(256, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_tam, self.tams_fronts_g)
+                    teste_dict[self.generation_count]['tf21'] = teste_tam
+                    teste3 = np.zeros(256, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste3, self.front0_mem_g)
+                    teste_dict[self.generation_count]['fronts0_mem_21'] = teste3
+                    teste4 = np.zeros(1, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste4, self.tam_front0_mem_g)
+                    teste_dict[self.generation_count]['tam_fronts0_mem_21'] = teste4
+                    teste_p = np.zeros(384 * 10, dtype=np.float32)
+                    cuda.memcpy_dtoh(teste_p, self.position_g)
+                    teste_p.shape = 384, 10
+                    teste_dict[self.generation_count]['pos21'] = teste_p
+                    teste_f = np.zeros(384 * 2, dtype=np.float32)
+                    cuda.memcpy_dtoh(teste_f, self.fitness_g)
+                    teste_f.shape = 384, 2
+                    teste_dict[self.generation_count]['fit21'] = teste_f
+
+                    #teste nan
+                    # teste_cur = np.zeros(1, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste_cur, self.params.current_memory_size_g)
+                    # dict2['cur'] = teste_cur
+                    # teste2 = np.zeros(256, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste2, self.fronts_g)
+                    # dict2['fronts'] = teste2
+                    # teste_tam = np.zeros(128, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste_tam, self.tams_fronts_g)
+                    # dict2['tam_fronts'] = teste_tam
+                    # teste3 = np.zeros(256, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste3, self.front0_mem_g)
+                    # dict2['fronts0_mem'] = teste3
+                    # teste4 = np.zeros(1, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste4, self.tam_front0_mem_g)
+                    # dict2['tam_fronts0_mem'] = teste4
+                    # teste_p = np.zeros(384 * 10, dtype=np.float32)
+                    # cuda.memcpy_dtoh(teste_p, self.position_g)
+                    # teste_p.shape = 384, 10
+                    # dict2['pos'] = teste_p
+                    # teste_f = np.zeros(384 * 2, dtype=np.float32)
+                    # cuda.memcpy_dtoh(teste_f, self.fitness_g)
+                    # teste_f.shape = 384, 2
+                    # dict2['fit'] = teste_f
+                    # pickle.dump(dict2, f_teste)
+                    # f_teste.close()
+
+                    # teste
+                    # teste2 = np.zeros(256, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste2, self.fronts_g)
+                    # print(teste2[:15])
+                    # teste3 = np.zeros(256, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste3, self.front0_mem_g)
+                    # print(teste3[:15])
+                    # teste4 = np.zeros(1, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste4, self.tam_front0_mem_g)
+                    # print(teste4)
+                    # teste_p = np.zeros(384 * 10, dtype=np.float32)
+                    # cuda.memcpy_dtoh(teste_p, self.position_g)
+                    # teste_p.shape = 384, 10
+                    # teste_f = np.zeros(384 * 2, dtype=np.float32)
+                    # cuda.memcpy_dtoh(teste_f, self.fitness_g)
+                    # teste_f.shape = 384, 2
+                    # pass
+
+                    # tam_front0_mem = np.zeros(1, dtype=np.int32)
+                    # cuda.memcpy_dtoh(tam_front0_mem, self.tam_front0_mem_g)
+                    # fast_nondominated_sort4 = self.mod.get_function("fast_nondominated_sort4")
+                    # fast_nondominated_sort4(self.fitness_g, self.params.objectives_dim_g,
+                    #                         self.domination_counter_g, self.params.population_size_g,
+                    #                         self.params.otimizations_type_g, self.params.objectives_dim_g,
+                    #                         self.front0_mem_g, self.tam_front0_mem_g,
+                    #                         block=(int(tam_front0_mem[0]), int(tam_front0_mem[0]), 1),
+                    #                         grid=(1, 1, 1))
+                    # cuda.Context.synchronize()
+
+                    tam_front0_mem = np.zeros(1, dtype=np.int32)
+                    cuda.memcpy_dtoh(tam_front0_mem, self.tam_front0_mem_g)
+                    if tam_front0_mem > 32:
+                        block_x = 32
+                        grid_x = int(np.ceil(tam_front0_mem[0] / 32))
+                    else:
+                        block_x = int(tam_front0_mem[0])
+                        grid_x = 1
+
+                    # fast_nondominated_sort4 = self.mod.get_function("fast_nondominated_sort4")
+                    # fast_nondominated_sort4(self.fitness_g, self.params.objectives_dim_g,
+                    #                         self.domination_counter_g, self.params.population_size_g,
+                    #                         self.params.otimizations_type_g, self.params.objectives_dim_g,
+                    #                         self.front0_mem_g, self.tam_front0_mem_g,
+                    #                         # block=(int(tam_front[0]), int(tam_front[0]), 1),
+                    #                         # grid=(1, 1, 1))
+                    #                         block=(block_x, block_x, 1),
+                    #                         grid=(grid_x, grid_x, 1))
+                    # cuda.Context.synchronize()
+
+                    fast_nondominated_sort4_2 = self.mod.get_function("fast_nondominated_sort4_2")
+                    fast_nondominated_sort4_2(self.fitness_g, self.params.objectives_dim_g,
+                                            self.domination_counter_g, self.params.population_size_g,
+                                            self.params.otimizations_type_g, self.params.objectives_dim_g,
+                                            self.front0_mem_g, self.tam_front0_mem_g,
+                                            # block=(int(tam_front[0]), int(tam_front[0]), 1),
+                                            # grid=(1, 1, 1))
+                                            block=(block_x, block_x, 1),
+                                            grid=(grid_x, grid_x, 1))
+                    cuda.Context.synchronize()
+
+                    # teste
+                    teste_f = np.zeros(384 * 2, dtype=np.float32)
+                    cuda.memcpy_dtoh(teste_f, self.fitness_g)
+                    teste_f.shape = 384, 2
+                    teste_dict[self.generation_count]['fit22'] = teste_f
+                    teste_d = np.zeros(385*385, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_d, self.domination_counter_g)
+                    teste_d.shape = 385, 385
+                    teste_dict[self.generation_count]['dc22'] = teste_d
+                    teste3 = np.zeros(256, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste3, self.front0_mem_g)
+                    teste_dict[self.generation_count]['fronts0_mem_22'] = teste3
+                    teste4 = np.zeros(1, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste4, self.tam_front0_mem_g)
+                    teste_dict[self.generation_count]['tam_fronts0_mem_22'] = teste4
+
+                    # teste
+                    # teste_d = np.zeros(25*25, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste_d, self.domination_counter_g)
+                    # teste_d.shape = 25, 25
+
+                    fast_nondominated_sort5 = self.mod.get_function("fast_nondominated_sort5")
+                    fast_nondominated_sort5(self.domination_counter_g,
+                                            block=(int(tam_front0_mem[0]), 1, 1),
+                                            grid=(1, 1, 1))
+                    cuda.Context.synchronize()
+
+                    #teste
+                    teste_d = np.zeros(385 * 385, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_d, self.domination_counter_g)
+                    teste_d.shape = 385, 385
+                    teste_dict[self.generation_count]['dc23'] = teste_d
+
+                    # teste
+                    # teste2 = np.zeros(13 * 12, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste2, self.domination_counter_g)
+                    # teste2.shape = 13, 12
+
+                    # self.front0_g testeTempo250624 o front zero do conjunto front0 da populacao + memoria atual
+                    fast_nondominated_sort6 = self.mod.get_function("fast_nondominated_sort6")
+                    fast_nondominated_sort6(self.domination_counter_g, self.tam_front0_mem_g,
+                                            self.front0_mem_g, self.tam_front0_g, self.front0_g,
+                                            block=(1, 1, 1), grid=(1, 1, 1))
+                    cuda.Context.synchronize()
+
+                    #teste
+                    teste_d = np.zeros(385 * 385, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste_d, self.domination_counter_g)
+                    teste_d.shape = 385, 385
+                    teste_dict[self.generation_count]['dc24'] = teste_d
+                    teste3 = np.zeros(256, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste3, self.front0_mem_g)
+                    teste_dict[self.generation_count]['fronts0_mem_24'] = teste3
+                    teste4 = np.zeros(1, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste4, self.tam_front0_mem_g)
+                    teste_dict[self.generation_count]['tam_fronts0_mem_24'] = teste4
+                    teste3 = np.zeros(384, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste3, self.front0_g)
+                    teste_dict[self.generation_count]['fronts0_24'] = teste3
+                    teste4 = np.zeros(1, dtype=np.int32)
+                    cuda.memcpy_dtoh(teste4, self.tam_front0_g)
+                    teste_dict[self.generation_count]['tam_fronts0_24'] = teste4
+
+                     if i < 4:
+                    self.weights[i][j] = truncnorm.rvs(0, 1) * self.params.mutation_rate
+                    if self.weights[i][j] > 1:
+                        self.weights[i][j] = 1
+                    elif self.weights[i][j] < 0:
+                        self.weights[i][j] = 0
+                if i == 4:
+                    self.weights[i][j] = truncnorm.rvs(0, 0.5) * self.params.mutation_rate
+                    if self.weights[i][j] > 0.5:
+                        self.weights[i][j] = 0.5
+                    elif self.weights[i][j] < 0:
+                        self.weights[i][j] = 0
+                if i == 5:
+                    self.weights[i][j] = truncnorm.rvs(0, 2) * self.params.mutation_rate
+                    if self.weights[i][j] > 2:
+                        self.weights[i][j] = 2
+                    elif self.weights[i][j] < 0:
+                        self.weights[i][j] = 0
+
+
+ate 3080(gpu2): testado e aprentemente nao tem erros graves de nan e 1e20 no fitness e position
+
+ate 3644 aparentemente ok
+4129: td zerado
+entre: fast sorting
+
+0.917915 0.917910 0.917790 0.916658 0.910192 0.880572 0.738193 0.114465 0.917915
+
+0.000000 0.000006 0.000152 0.001522 0.009074 0.039018 0.133920 0.389744 1.000000
+
+testar as mudancas em function e sigma_eval para emular populacoes maiores. Testar tb com pop menores

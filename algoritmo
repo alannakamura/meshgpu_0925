@@ -1,0 +1,102 @@
+mesh.run
+
+1 - criar as particulas, iniciar suas posições de forma aleatória e colocá-las num vetor de particulas
+2 - o que são parametros secundários?
+3 - avalia através das funções objetivo o vetor de avaliações para cada particula.
+3.1 - atualizar o personal best de cada particula, que inicialmente é a propria particula
+4 - ordena as particulas por fronts
+5 - inicializa a memoria. Ele conterá as particulas com menores valores de ranking. Se precisar de desempate,
+será usado o crowding distance
+6 - qual a ideia do crowding distance? Se o crowding distance for alto, significa que as particulas estao mais
+distantes dessa e portanto ela é mais "diferente" em relação aos demais?
+
+7 - loop principal
+
+7.1 - fazer a DE mutation para cada particula da populacao
+
+7.1.1 escolher um personal best aleatorio do conjunto de personal best
+7.1.2 definir o xr pool.
+
+if not personal_best == p or not particle == p
+if personal_best != p or particle != p
+if not (personal_best == p and particle == p)
+
+nao entra no if:
+personal_best == p and particle == p(V)
+personal_best == p(V)
+particle == p(V)
+quando personal best igual a particula e igual a p
+quando personal for diferente da particula, todas as particulas entram no pool
+quando for igual, apenas a particula nao entra
+as particulas candidatas sao da memoria, da população ou de ambos
+
+7.1.3 realiza a DE mutation
+
+a) seleciona alguns elementos do pool
+b) cria uma combinação xst a partir desses elementos e do peso w5 da particula atual
+c) sorteia 1 ou mais indices a ser mutados usando o peso w4 da particula
+d) muta os indices escolhidos do xst. A mutacao consiste em trocar o elemento dos indices
+escolhidos pelos correspondentes elementosdo personal best ou global best escolhido no inicio
+e) no final, se a particula xst mutada dominar a particula atual, substituir a atual pela xst
+
+7.2 se houve alguma mudança de particulas na de mutation, reordenar os fronts e atualizar a memoria
+
+7.2.1 - reordenar a memoria:
+a) criar um conjunto com o atual front 0 e a memoria atual
+b) reordenar o novo conjunto
+c) selecionar  os elementos de fronts menores ate o lmite da memoria
+d) desempatar com o crowding distance
+
+7.3 se self.copy=True, cria uma copia da populacao e dos pesos
+duvida: pq testar se o self.copy sempre e True?
+
+7.4 mutação dos pesos: usando self.params.mutation_rate.
+duvida: como foram definidos os limites do truncnorm?
+
+7.5 calculo de melhores globais
+a) calcule o sigma de cada particula da memoria
+b) se usar fronteiras:
+b1) calcular sigma de cada elemento da populacao
+b2) se a particula for de rank 0, usar o front 0. Senão, usar o rank anterior ao rank da particula
+b3) o global best segundo o que entendi no codigo, é a particula do pool cujo vetor sigma esta a
+um distancia menor euclediana a das demais.
+
+duvida no codigo: distancia sigma começa como maximo e depois vai atualziando as distancias menores.
+Se tiver 1 particula no pool de busca, entao sempre vai haver uma particula com distancia menor que o maximo
+e nearest particle sera diferente de None. issos eria para o caso do  conjuntod e fronts anteriores ser vazio?
+
+duvida 2: Então o global best nao e o melhor global ate o momento, e o melhor entre as particulas com
+ranks proximos?
+
+duvida 3: self.params.global_best_attribution_type >=2 esta dentro do
+if self.params.global_best_attribution_type == 0 or self.params.global_best_attribution_type == 1:
+e nunca e alcançado? os ifs a partir do segundo deveriam ser alinhados com o primeiro?
+def global_best_attribution
+
+7.6 mover todas particulas e as copias das particulas
+
+a) selecionar um personal best aleatorio do conjuntod e personal bests da particula
+b) calcular termo de inercia: velocidade * w0
+c) calcular termod e memoria: w1*(personalBest - particula)
+d) calcular cooperation_term: w2*(global_best*(1+w3*aleatorio-posicao))*C
+e) nova velocidade é a soma dos tres termos
+f) nova posicao e a posicao+velocidade
+g) verifica se posicao nova e velocidade estao nos limites
+h) reavalia a particula
+
+duvida) nao entendi o termo d)
+
+7.7 recalcular os fronts apos os movimentos
+
+7.8 selecionar as particulas com menores rankings para a proxima geração ate estourar o limite
+de populacao. Quando chegar nisso, selecionar os melhores do pior front pelo crowding distance
+
+duvida: a seleção da proxima geração esta dentro de if self.copy_pop.
+Se nao houver copia nao ha seleção? E pq estaria dentro desse if se nao utiliza as copias?
+
+7.9) atualiza a memoria
+7.10) escreve ois resultados em cada iteração?
+7.11) verifica se atingiu o limited e gerações ou de avaliações
+
+
+
