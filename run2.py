@@ -106,7 +106,7 @@ for func_n in [int(problem)]:
 
     if func_n<31:
         restrictions_dim = 0
-    elif func_n in [31, 32]:
+    elif func_n in [31, 32, 36]:
         restrictions_dim = 1
     elif func_n in [33]:
         restrictions_dim = 2

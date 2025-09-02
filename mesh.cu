@@ -641,7 +641,8 @@ __device__ double g3_mw(int m, int n, double *position, int i)
 
     for(j=m-1;j<n;j++)
     {
-        temp = position[(i-1)*n+j]-0.5;
+//         temp = position[(i-1)*n+j]-0.5;
+        temp = position[i*n+(j-1)]-0.5;
         temp *= temp;
         temp += position[(i*n+j)];
         temp -= 1;
@@ -732,6 +733,8 @@ __device__ void mw3(double *position, int *position_dim, double *fitness, int i,
     l = sqrt(2.0)*fitness[i*4+1] - sqrt(2.0) * fitness[i*4+0];
     fitness[i*4+2] = fitness[i*4+1] + fitness[i*4+0] -1.05 - 0.45*pow(sin(0.75*M_PI*l), 6);
     fitness[i*4+3] = 0.85 - fitness[i*4+1] - fitness[i*4+0] + 0.3*pow(sin(0.75*M_PI*l), 2);
+//     fitness[i*4+2] = -1;
+//     fitness[i*4+3] = -1;
 }
 
 
@@ -820,18 +823,18 @@ __device__ void mw5(double *position, int *position_dim, double *fitness, int i,
 
 __device__ void mw6(double *position, int *position_dim, double *fitness, int i, double *alpha)
 {
-    double g=0, l, c=0, temp;
+    double g=0, l, temp;
 
     g = g2_mw(2, position_dim[0], position, i);
 
-    fitness[i*2+0] =  g*position[i*position_dim[0]+0];
-    fitness[i*2+1] =  g*sqrt(1.1*1.1-pow((fitness[i*2+0]/g), 2));
+    fitness[i*3+0] =  g*position[i*position_dim[0]+0];
+    fitness[i*3+1] =  g*sqrt(1.1*1.1-pow((fitness[i*3+0]/g), 2));
 
 //     l = fitness[i*2+1]/fitness[i*2+0];
 //     l = powf(l, 4);
 //     l = atanf(l);
 
-    l = atan(fitness[i*2+1]/fitness[i*2+0]);
+    l = atan(fitness[i*3+1]/fitness[i*3+0]);
 
 //     if(fitness[i*2+0] == 0)
 //     {
@@ -844,14 +847,15 @@ __device__ void mw6(double *position, int *position_dim, double *fitness, int i,
     l = pow(l, 10);
 
     temp = 1.0+0.15*l;
-    temp = fitness[i*2+0]/temp;
+    temp = fitness[i*3+0]/temp;
     temp = temp * temp;
-    c = c + temp;
+    fitness[i*3+2] += temp;
     temp = 1.0+0.75*l;
-    temp = fitness[i*2+1]/temp;
+    temp = fitness[i*3+1]/temp;
     temp = temp * temp;
-    c = c + temp;
-    c = c - 1.0;
+    fitness[i*3+2] += temp;
+    fitness[i*3+2] -= 1.0;
+//     c = c - 1.0;
 
 //     if(fitness[i*2+0] == 0)
 //     {
@@ -863,11 +867,11 @@ __device__ void mw6(double *position, int *position_dim, double *fitness, int i,
 //         fitness[i*2+0] = 1.5 + c;
 //         fitness[i*2+1] = 2.0 + c;
 //     }
-    if(c>0)
-    {
-        fitness[i*2+0] += alpha[0]*c;
-        fitness[i*2+1] += alpha[0]*c;
-    }
+//     if(c>0)
+//     {
+//         fitness[i*2+0] += alpha[0]*c;
+//         fitness[i*2+1] += alpha[0]*c;
+//     }
 }
 
 __device__ void mw7(double *position, int *position_dim, double *fitness, int i, double *alpha)
