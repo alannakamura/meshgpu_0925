@@ -9,7 +9,7 @@ from optimisationMap import *
 import pickle
 
 # name_file = 'results.pkl'
-name_file = 'results_4_100sim_100iter_128pop_3posdim_1.0alpha_5070_Ti.pkl'
+name_file = 'results_33_10sim_100iter_128pop_3posdim_2.0alpha_4060.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
@@ -43,7 +43,8 @@ for i in range(sim):
     result = results[i]
     lenMem.append(result[2][0])
     fim = tam_pop*2 + result[2][0]
-    fit.extend(result[1][tam_pop*2:fim])
+    n_obj = result[-1][-1]
+    fit.extend(result[1][tam_pop*2:fim][:, 0:n_obj])
 
 fit = np.array(fit)
 
@@ -80,15 +81,15 @@ else:
     plt.legend(['pareto pymoo', 'pareto teste', 'GPU'])
     plt.show()
 
-# plt.figure()
-# plt.plot(pf_a[:, 0], pf_a[:, 1], 'ro')
-# plt.title(name_problem.upper()+ ' PARETO')
-# plt.show()
-#
-# plt.figure()
-# plt.plot(fit[:, 0], fit[:, 1], 'ro')
-# plt.title(name_problem.upper()+ ' MESH GPU')
-# plt.show()
+plt.figure()
+plt.plot(pf_a[:, 0], pf_a[:, 1], 'ro')
+plt.title(name_problem.upper()+ ' PARETO')
+plt.show()
+
+plt.figure()
+plt.plot(fit[:, 0], fit[:, 1], 'ro')
+plt.title(name_problem.upper()+ ' MESH GPU')
+plt.show()
 
 hv = hypervolume(pf_a)
 print('hypervolume_paretto', hv.compute(ref))
