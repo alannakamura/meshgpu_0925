@@ -636,7 +636,7 @@ __device__ double g2_mw(int m, int n, double *position, int i)
 
 __device__ double g3_mw(int m, int n, double *position, int i)
 {
-    double g3 = 0, temp;
+    double g3 = 0.0, temp;
     int j;
 
     for(j=m-1;j<n;j++)
@@ -669,56 +669,28 @@ __device__ double restricao2(double a, double b, double c, double d, double e)
 __device__ void mw1(double *position, int *position_dim, double *fitness,
 double *restrictions, int i, double *alpha)
 {
-    double g=0, l, pi = 3.14159265358979323846, c;
+    double g=0, l;
 
     g = g1_mw(2, position_dim[0], position, i);
 
-//     printf("%d p0=%lf p1=%lf %lf\n", i,position[i*10], fitness[i*10+1], g);
-
     fitness[i*3+0] =  position[i*position_dim[0]+0];
-    fitness[i*3+1] =  g*(1-0.85*fitness[i*3+0]/g);
+    fitness[i*3+1] =  g - 0.85*fitness[i*3+0];
 
-    l = sqrt(2.0)*fitness[i*3+1] - sqrt(2.0) * fitness[i*3+0];
-//     c = fitness[i*2+1] + fitness[i*2+0] -1 - 0.5*pow(sin(2*pi*l), 8);
-//     viavel c<=0
-    c = fitness[i*3+1] + fitness[i*3+0] -1 - 0.5*pow(sin(2*pi*l), 8);
-
-//     printf("%d %lf %lf %lf\n", i, fitness[i*2], fitness[i*2+1], g);
-
-//     if(c>0)
-    if(c>0)
-    {
-//         printf("%d %lf %lf\n", i, c, g);
-//         printf("%d \n", i);
-//         fitness[i*2+0] += alpha[0]*c;
-//         fitness[i*2+1] += alpha[0]*c;
-//         fitness[i*2+0] = 1.0 + c;
-//         fitness[i*2+1] = 1.5 + c;
-        fitness[i*3+0] += alpha[0]*c;
-        fitness[i*3+1] += alpha[0]*c;
-    }
+    l = sqrt(2.0)*(fitness[i*3+1] - fitness[i*3+0]);
+    fitness[i*3+2] = fitness[i*3+1] + fitness[i*3+0] -1 - 0.5*pow(sin(2*M_PI*l), 8);
 }
 
 __device__ void mw2(double *position, int *position_dim, double *fitness, int i, double *alpha)
 {
-    double g=0, l, pi = 3.141592;
+    double g=0, l;
 
     g = g2_mw(2, position_dim[0], position, i);
 
     fitness[i*3+0] =  position[i*position_dim[0]+0];
-    fitness[i*3+1] =  g*(1-fitness[i*3+0]/g);
+    fitness[i*3+1] =  g - fitness[i*3+0];
 
-    l = sqrt(2.0)*fitness[i*3+1] - sqrt(2.0) * fitness[i*3+0];
-//     c = fitness[i*3+1] + fitness[i*3+0] -1 - 0.5*pow(sin(3*pi*l), 8);
-    fitness[i*3+2] = fitness[i*3+1] + fitness[i*3+0] -1 - 0.5*pow(sin(3*pi*l), 8);
-
-//     if(c>0)
-//     {
-// //         fitness[i*2+0] = 1.0 + c;
-// //         fitness[i*2+1] = 1.5 + c;
-//         fitness[i*3+0] += alpha[0]*c;
-//         fitness[i*3+1] += alpha[0]*c;
-//     }
+    l = sqrt(2.0)*(fitness[i*3+1] - fitness[i*3+0]);
+    fitness[i*3+2] = fitness[i*3+1] + fitness[i*3+0] -1 - 0.5*pow(sin(3*M_PI*l), 8);
 }
 
 __device__ void mw3(double *position, int *position_dim, double *fitness, int i, double *alpha)
@@ -728,15 +700,12 @@ __device__ void mw3(double *position, int *position_dim, double *fitness, int i,
     g = g3_mw(2, position_dim[0], position, i);
 
     fitness[i*4+0] =  position[i*position_dim[0]+0];
-    fitness[i*4+1] =  g*(1-fitness[i*4+0]/g);
+    fitness[i*4+1] =  g - fitness[i*4+0];
 
-    l = sqrt(2.0)*fitness[i*4+1] - sqrt(2.0) * fitness[i*4+0];
+    l = sqrt(2.0)*(fitness[i*4+1] - fitness[i*4+0]);
     fitness[i*4+2] = fitness[i*4+1] + fitness[i*4+0] -1.05 - 0.45*pow(sin(0.75*M_PI*l), 6);
     fitness[i*4+3] = 0.85 - fitness[i*4+1] - fitness[i*4+0] + 0.3*pow(sin(0.75*M_PI*l), 2);
-//     fitness[i*4+2] = -1;
-//     fitness[i*4+3] = -1;
 }
-
 
 __device__ void mw4(double *position, int *position_dim, double *fitness, int i, double *alpha)
 {
@@ -765,60 +734,32 @@ __device__ void mw4(double *position, int *position_dim, double *fitness, int i,
 
 __device__ void mw5(double *position, int *position_dim, double *fitness, int i, double *alpha)
 {
-    double g=0, l[2], c[3], pi = 3.141592;
+    double g=0, l[2];
 
     g = g1_mw(2, position_dim[0], position, i);
 
-    fitness[i*2+0] =  g*position[i*position_dim[0]+0];
-    fitness[i*2+1] =  g*sqrt(1-pow((fitness[i*2+0]/g), 2));
+    fitness[i*5+0] =  g*position[i*position_dim[0]+0];
+    fitness[i*5+1] =  g*sqrt(1-pow((fitness[i*5+0]/g), 2));
 
-    l[0] = atan(fitness[i*2+1]/fitness[i*2+0]);
-    l[1] = 0.5*pi -2*abs(l[0]-0.25*pi);
+    l[0] = atan2(fitness[i*5+1], fitness[i*5+0]);
+    l[1] = 0.5*M_PI -2*abs(l[0]-0.25*M_PI);
 
-    c[0] = restricao2(-0.2, 2, l[0], 1, 1) + 1.7;
-    c[0] *= c[0];
-    c[0] *= -1;
-    c[0] += fitness[i*2+0] * fitness[i*2+0];
-    c[0] += fitness[i*2+1] * fitness[i*2+1];
+    fitness[i*5+2] = restricao2(-0.2, 2, l[0], 1, 1) + 1.7;
+    fitness[i*5+2] *= fitness[i*5+2];
+    fitness[i*5+2] *= -1;
+    fitness[i*5+2] += fitness[i*5+0] * fitness[i*5+0];
+    fitness[i*5+2] += fitness[i*5+1] * fitness[i*5+1];
 
-    c[1] = restricao2(0.5, 6, l[1], 3, 1) + 1.0;
-    c[1] *= c[1];
-    c[1] -= fitness[i*2+0] * fitness[i*2+0];
-    c[1] -= fitness[i*2+1] * fitness[i*2+1];
+    fitness[i*5+3] = restricao2(0.5, 6, l[1], 3, 1) + 1.0;
+    fitness[i*5+3] *= fitness[i*5+3];
+    fitness[i*5+3] -= fitness[i*5+0] * fitness[i*5+0];
+    fitness[i*5+3] -= fitness[i*5+1] * fitness[i*5+1];
 
-    c[2] = restricao2(-0.45, 6, l[1], 3, 1) + 1.0;
-    c[2] *= c[2];
-    c[2] -= fitness[i*2+0] * fitness[i*2+0];
-    c[2] -= fitness[i*2+1] * fitness[i*2+1];
+    fitness[i*5+4] = restricao2(-0.45, 6, l[1], 3, 1) + 1.0;
+    fitness[i*5+4] *= fitness[i*5+4];
+    fitness[i*5+4] -= fitness[i*5+0] * fitness[i*5+0];
+    fitness[i*5+4] -= fitness[i*5+1] * fitness[i*5+1];
 
-
-//     if((c[0] > 0 || c[1] > 0 || c[2]>0))
-//     {
-//         fitness[i*2+0] = 2.0;
-//         fitness[i*2+1] = 2.0;
-//     }
-
-    if(c[0]>0)
-    {
-        fitness[i*2+0] += alpha[0]*c[0];
-        fitness[i*2+1] += alpha[0]*c[0];
-//         fitness[i*2+0] += c[0];
-//         fitness[i*2+1] += c[0];
-    }
-    if(c[1]>0)
-    {
-        fitness[i*2+0] += alpha[0]*c[1];
-        fitness[i*2+1] += alpha[0]*c[1];
-//         fitness[i*2+0] += c[1];
-//         fitness[i*2+1] += c[1];
-    }
-    if(c[2]>0)
-    {
-        fitness[i*2+0] += alpha[0]*c[2];
-        fitness[i*2+1] += alpha[0]*c[2];
-//         fitness[i*2+0] += c[2];
-//         fitness[i*2+1] += c[2];
-    }
 }
 
 __device__ void mw6(double *position, int *position_dim, double *fitness, int i, double *alpha)
@@ -830,16 +771,7 @@ __device__ void mw6(double *position, int *position_dim, double *fitness, int i,
     fitness[i*3+0] =  g*position[i*position_dim[0]+0];
     fitness[i*3+1] =  g*sqrt(1.1*1.1-pow((fitness[i*3+0]/g), 2));
 
-//     l = fitness[i*2+1]/fitness[i*2+0];
-//     l = powf(l, 4);
-//     l = atanf(l);
-
     l = atan2(fitness[i*3+1], fitness[i*3+0]);
-
-//     if(fitness[i*2+0] == 0)
-//     {
-//         printf("i=%d l=%lf\n",i,l);
-//     }
 
     l = pow(l, 4);
     l = l * 6;
@@ -855,69 +787,31 @@ __device__ void mw6(double *position, int *position_dim, double *fitness, int i,
     temp = temp * temp;
     fitness[i*3+2] += temp;
     fitness[i*3+2] -= 1.0;
-//     c = c - 1.0;
 
-//     if(fitness[i*2+0] == 0)
-//     {
-//         printf("i=%d l=%lf c=%lf\n",i,l,c);
-//     }
-
-//     if(c>0)
-//     {
-//         fitness[i*2+0] = 1.5 + c;
-//         fitness[i*2+1] = 2.0 + c;
-//     }
-//     if(c>0)
-//     {
-//         fitness[i*2+0] += alpha[0]*c;
-//         fitness[i*2+1] += alpha[0]*c;
-//     }
 }
 
 __device__ void mw7(double *position, int *position_dim, double *fitness, int i, double *alpha)
 {
-    double g=0, l, c[2];
+    double g=0, l;
 
     g = g3_mw(2, position_dim[0], position, i);
 
-    fitness[i*2+0] =  g*position[i*position_dim[0]+0];
-//     fitness[i*2+1] =  g*sqrtf(1-powf((fitness[i*2+0]/g), 2));
-    fitness[i*2+1] =  g*sqrt(1-pow((fitness[i*2+0]/g), 2));
+    fitness[i*4+0] =  g*position[i*position_dim[0]+0];
+    fitness[i*4+1] =  g*sqrt(1-pow((fitness[i*4+0]/g), 2));
 
-//     l = atanf(fitness[i*2+1]/fitness[i*2+0]);
-    l = atan(fitness[i*2+1]/fitness[i*2+0]);
+    l = atan2(fitness[i*4+1], fitness[i*4+0]);
 
-    c[0] = restricao2(0.4, 4, l, 1, 16) + 1.2;
-    c[0] *= c[0];
-    c[0] *= -1;
-    c[0] += fitness[i*2+0] * fitness[i*2+0];
-    c[0] += fitness[i*2+1] * fitness[i*2+1];
+    fitness[i*4+2] = restricao2(0.4, 4, l, 1, 16) + 1.2;
+    fitness[i*4+2] = pow(fitness[i*4+2],2);
+    fitness[i*4+2] *= -1;
+    fitness[i*4+2] += fitness[i*4+0] * fitness[i*4+0];
+    fitness[i*4+2] += fitness[i*4+1] * fitness[i*4+1];
 
-    c[1] = restricao2(-0.2, 4, l, 1, 8) + 1.15;
-    c[1] *= c[1];
-    c[1] -= fitness[i*2+0] * fitness[i*2+0];
-    c[1] -= fitness[i*2+1] * fitness[i*2+1];
+    fitness[i*4+3] = restricao2(-0.2, 4, l, 1, 8) + 1.15;
+    fitness[i*4+3] = pow(fitness[i*4+3], 2);
+    fitness[i*4+3] -= fitness[i*4+0] * fitness[i*4+0];
+    fitness[i*4+3] -= fitness[i*4+1] * fitness[i*4+1];
 
-//     if(c[0] > 0 || c[1] > 0)
-//     {
-//         fitness[i*2+0] = 2.0;
-//         fitness[i*2+1] = 2.0;
-//     }
-
-    if(c[0]>0)
-    {
-        fitness[i*2+0] += alpha[0]*c[0];
-        fitness[i*2+1] += alpha[0]*c[0];
-//         fitness[i*2+0] += c[0];
-//         fitness[i*2+1] += c[0];
-    }
-    if(c[1]>0)
-    {
-        fitness[i*2+0] += alpha[0]*c[1];
-        fitness[i*2+1] += alpha[0]*c[1];
-//         fitness[i*2+0] += c[1];
-//         fitness[i*2+1] += c[1];
-    }
 }
 
 __device__ void mw9(double *position, int *position_dim, double *fitness, int i,
@@ -1445,6 +1339,7 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
 {
     int obj_dim = dim[2];
     int total_dim = dim[0];
+//     double tol = 1e-3;
 
     int inviavel1 = 0, inviavel2 = 0;
     double violacao_total1 = 0.0, violacao_total2 = 0.0;
@@ -1476,7 +1371,6 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
             if (fitness1[j] > 0.0) violacao_total1 += fitness1[j];
             if (fitness2[j] > 0.0) violacao_total2 += fitness2[j];
         }
-
         return (violacao_total1 < violacao_total2) ? 1 : 0;
     }
 

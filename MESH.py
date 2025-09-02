@@ -1970,7 +1970,7 @@ class MESH:
                         cuda.Context.synchronize()
 
                         div = int(np.ceil(tam_front0[0] / 1024))
-                        for i in range(self.params.objectives_dim):
+                        for i in range(self.params.objectives_dim[0]):
                             # ordena os fronts em ordem crescente de cada coordenada fitness
                             cuda.memcpy_htod(i_g, np.array([i], dtype=np.int32))
                             front_sort = self.mod.get_function("front_sort")
@@ -2690,7 +2690,7 @@ class MESH:
                         i_g = cuda.mem_alloc(np.array([1], np.int32).nbytes)
                         total = tam_front[0]-2
                         div = int(np.ceil(total/1024))
-                        for i in range(self.params.objectives_dim):
+                        for i in range(self.params.objectives_dim[0]):
                             # ordena os fronts em ordem crescente de cada coordenada fitness
                             cuda.memcpy_htod(i_g, np.array([i], dtype=np.int32))
                             front_sort = self.mod.get_function("front_sort")

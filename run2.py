@@ -85,7 +85,7 @@ for func_n in [int(problem)]:
         position_max_value = [1] * position_dim
         # position_min_value = [1e-6] * position_dim
         position_min_value = [0] * position_dim
-    if func_n in [36]:
+    elif func_n in [36]:
         position_max_value = [1.1] * position_dim
         position_min_value = [0] * position_dim
     elif func_n in [14]:
@@ -107,12 +107,12 @@ for func_n in [int(problem)]:
         position_max_value = []
         position_min_value = []
 
-    if func_n<31:
-        restrictions_dim = 0
-    elif func_n in [31, 32, 36]:
+    if func_n in [31, 32, 36]:
         restrictions_dim = 1
-    elif func_n in [33]:
+    elif func_n in [33, 37]:
         restrictions_dim = 2
+    elif func_n in [35]:
+        restrictions_dim = 3
     else:
         restrictions_dim = 0
 
@@ -129,13 +129,13 @@ for func_n in [int(problem)]:
     global_best_attribution_type = 1     # 0 -> E1 | 1 -> E2 | 2 -> E3 | 3 -> E4
     Xr_pool_type = 1                  # 0 ->  V1 | 1 -> V2 | 2 -> V3
     DE_mutation_type = 0        # 0 -> DE\rand\1\Bin | 1 -> DE\rand\2\Bin | 2 -> DE/Best/1/Bin | 3 -> DE/Current-to-best/1/Bin | 4 -> DE/Current-to-rand/1/Bin
-    crowd_distance_type = 1     # 0 -> Crowding Distance Tradicional | 1 -> Crowding Distance Suganthan
+    crowd_distance_type = 0     # 0 -> Crowding Distance Tradicional | 1 -> Crowding Distance Suganthan
 
     config = f"E{global_best_attribution_type + 1}V{Xr_pool_type + 1}D{DE_mutation_type + 1}C{crowd_distance_type+1}"
 
     print(f"Running E{global_best_attribution_type+1}V{Xr_pool_type+1}D{DE_mutation_type+1}C{crowd_distance_type+1} on {optimisationMap[func_n]}")
 
-    print('problem', problem, optimisationMap[problem], 'max_iters', max_num_iters, 'alpha', alpha)
+    print('problem', problem, optimisationMap[problem], 'max_iters', max_num_iters)
 
     for i in tqdm(range(num_runs)):
         params = MESH_Params(objectives_dim, otimizations_type, max_iterations,
