@@ -834,7 +834,7 @@ __device__ void mw6(double *position, int *position_dim, double *fitness, int i,
 //     l = powf(l, 4);
 //     l = atanf(l);
 
-    l = atan(fitness[i*3+1]/fitness[i*3+0]);
+    l = atan2(fitness[i*3+1], fitness[i*3+0]);
 
 //     if(fitness[i*2+0] == 0)
 //     {
@@ -849,7 +849,7 @@ __device__ void mw6(double *position, int *position_dim, double *fitness, int i,
     temp = 1.0+0.15*l;
     temp = fitness[i*3+0]/temp;
     temp = temp * temp;
-    fitness[i*3+2] += temp;
+    fitness[i*3+2] = temp;
     temp = 1.0+0.75*l;
     temp = fitness[i*3+1]/temp;
     temp = temp * temp;
