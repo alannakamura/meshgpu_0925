@@ -67,9 +67,9 @@ for func_n in [int(problem)]:
             or 21 <=func_n <= 21
             or 31 <= func_n <= 33
             or 35 <= func_n <=37
-            or 39 <=func_n <= 310):
+            or 39 <=func_n <= 313):
         objectives_dim = 2
-    elif 1 <= func_n <= 7 or func_n == 34:
+    elif func_n in [1,2,3,4,5,6,7,34,38,314]:
         objectives_dim = 3
     else:
         objectives_dim = -1
@@ -81,12 +81,15 @@ for func_n in [int(problem)]:
     max_fitness_eval = -1
     position_dim = pos_dim
     if func_n in [1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 16,
-                  31, 32, 33, 34, 35, 37, 39, 310]:
+                  31, 32, 33, 34, 35, 37, 39, 310, 312]:
         position_max_value = [1] * position_dim
         # position_min_value = [1e-6] * position_dim
         position_min_value = [0] * position_dim
     elif func_n in [36]:
         position_max_value = [1.1] * position_dim
+        position_min_value = [0] * position_dim
+    elif func_n in [313]:
+        position_max_value = [1.5] * position_dim
         position_min_value = [0] * position_dim
     elif func_n in [14]:
         position_max_value = [10] * position_dim
@@ -102,17 +105,21 @@ for func_n in [int(problem)]:
         position_min_value = [0] * position_dim
         for i in range(position_dim):
             position_max_value[i] = 2*(i+1)
-            # position_max_value[i] = 1
+    elif func_n == 311:
+        position_min_value = [0] * position_dim
+        position_max_value = [np.sqrt(2.0)] * position_dim
     else:
         position_max_value = []
         position_min_value = []
 
-    if func_n in [31, 32, 36]:
+    if func_n in [31, 32, 36, 39]:
         restrictions_dim = 1
-    elif func_n in [33, 37]:
+    elif func_n in [33, 37, 312, 313]:
         restrictions_dim = 2
-    elif func_n in [35]:
+    elif func_n in [35, 310]:
         restrictions_dim = 3
+    elif func_n in [311]:
+        restrictions_dim = 4
     else:
         restrictions_dim = 0
 

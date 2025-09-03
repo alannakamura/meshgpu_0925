@@ -46,6 +46,7 @@ for i in range(30):
     # Algoritmo
     algorithm = NSGA2(
         pop_size=128,
+        sampling= X
     )
 
     # Otimização
@@ -54,8 +55,8 @@ for i in range(30):
         algorithm,
         termination,
         seed=i,
-        verbose=True,
-        X = X
+        verbose=True
+        # X = X
     )
 
     l.append((res.F, res.X))

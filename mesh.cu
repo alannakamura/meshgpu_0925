@@ -817,234 +817,132 @@ __device__ void mw7(double *position, int *position_dim, double *fitness, int i,
 __device__ void mw9(double *position, int *position_dim, double *fitness, int i,
 double *alpha)
 {
-    double g, T[3];
+    double g, T[3], f0, f1;
 
     g = g1_mw(2, position_dim[0], position, i);
 
-    fitness[i*2+0] =  g*position[i*position_dim[0]+0];
-    fitness[i*2+1] =  g*(1-powf((fitness[i*2+0]/g), 0.6));
+    f0 = g*position[i*position_dim[0]+0];
+    f1 = g*(1-pow((fitness[i*3+0]/g), 0.6));
 
-    T[0] = fitness[i*2+0]*fitness[i*2+0];
+    fitness[i*3+0] =  f0;
+    fitness[i*3+1] =  f1;
+
+    T[0] = f0*f0;
     T[0] *= -0.64;
-    T[0] -= fitness[i*2+1];
+    T[0] -= f1;
     T[0] += 1;
-    T[1] = fitness[i*2+0]*fitness[i*2+0];
+    T[1] = f0*f0;
     T[1] *= -0.36;
-    T[1] -= fitness[i*2+1];
+    T[1] -= f1;
     T[1] += 1;
     T[0] = T[0]*T[1];
 
-    T[1] = fitness[i*2+0] + 0.35;
+    T[1] = f0 + 0.35;
     T[1] *= T[1];
     T[1] *= -1;
-    T[1] -= fitness[i*2+1];
-    T[1] += powf(1.35, 2);
+    T[1] -= f1;
+    T[1] += pow(1.35, 2);
 
-    T[2] = fitness[i*2+0] + 0.15;
+    T[2] = f0 + 0.15;
     T[2] *= T[2];
     T[2] *= -1;
-    T[2] -= fitness[i*2+1];
-    T[2] += powf(1.15, 2);
+    T[2] -= f1;
+    T[2] += pow(1.15, 2);
 
     T[1] *= T[2];
 
-//     T[0] guarda o minimo entre T[0 e T[1]
-    if(T[0]>T[1])
-    {
-        T[0] = T[1];
-    }
-
-    if(T[0]>0)
-    {
-        if(alpha[0]<0)
-        {
-            fitness[i*2+0] = 1.1 + T[0];
-            fitness[i*2+1] = 1.1 + T[0];
-        }
-        else
-        {
-            fitness[i*2+0] += alpha[0]*T[0];
-            fitness[i*2+1] += alpha[0]*T[0];
-        }
-    }
+    fitness[i*3+2] = min(T[0], T[1]);
 }
 
 __device__ void mw10(double *position, int *position_dim, double *fitness, int i, double *alpha)
 {
-    double g=0, c[3], temp;
+    double g=0, c[3], temp, f0, f1;
 
     g = g2_mw(2, position_dim[0], position, i);
 
-    fitness[i*2+0] =  g*powf(position[i*position_dim[0]+0], position_dim[0]);
-    fitness[i*2+1] =  g*(1-powf((fitness[i*2+0]/g), 2));
+    f0 = g*pow(position[i*position_dim[0]+0], position_dim[0]);
+    f1 = g*(1-pow((fitness[i*5+0]/g), 2));
 
-    c[0] = fitness[i*2+0] * fitness[i*2+0];
+    fitness[i*5+0] =  f0;
+    fitness[i*5+1] =  f1;
+
+    c[0] = pow(f0, 2);
     c[0] *= -4;
-    c[0] -= fitness[i*2+1];
+    c[0] -= f1;
     c[0] += 2;
-
-    temp = fitness[i*2+0] * fitness[i*2+0];
+    temp = pow(f0,2);
     temp *= -8;
-    temp -= fitness[i*2+1];
+    temp -= f1;
     temp += 2;
     c[0] *= temp;
-    c[0] *= -1;
+    fitness[i*5+2] = -1*c[0];
 
-    c[1] = fitness[i*2+0] * fitness[i*2+0];
+    c[1] = pow(f0, 2);
     c[1] *= -2;
-    c[1] -= fitness[i*2+1];
+    c[1] -= f1;
     c[1] += 2;
-
-    temp = fitness[i*2+0] * fitness[i*2+0];
+    temp = pow(f0, 2);
     temp *= -16;
-    temp -= fitness[i*2+1];
+    temp -= f1;
     temp += 2;
-    c[1] *= temp;
+    fitness[i*5+3] = c[1] * temp;
 
-    c[2] = fitness[i*2+0] * fitness[i*2+0];
+    c[2] = pow(f0, 2);
     c[2] *= -1;
-    c[2] -= fitness[i*2+1];
+    c[2] -= f1;
     c[2] += 1;
-
-    temp = fitness[i*2+0] * fitness[i*2+0];
+    temp = pow(f0, 2);;
     temp *= -1.2;
-    temp -= fitness[i*2+1];
+    temp -= f1;
     temp += 1.2;
-    c[2] *= temp;
-
-    if((c[0] > 0 || c[1] > 0))
-    {
-        fitness[i*2+0] = 1.1;
-        fitness[i*2+1] = 1.5;
-    }
-
-    if(c[0]>0)
-    {
-//         fitness[i*2+0] += alpha[0]*c[0];
-//         fitness[i*2+1] += alpha[0]*c[0];
-        fitness[i*2+0] += c[0];
-        fitness[i*2+1] += c[0];
-    }
-    if(c[1]>0)
-    {
-//         fitness[i*2+0] += alpha[0]*c[1];
-//         fitness[i*2+1] += alpha[0]*c[1];
-        fitness[i*2+0] += c[1];
-        fitness[i*2+1] += c[1];
-    }
-    if(c[2]>0)
-    {
-//         fitness[i*2+0] += alpha[0]*c[2];
-//         fitness[i*2+1] += alpha[0]*c[2];
-        fitness[i*2+0] += c[2];
-        fitness[i*2+1] += c[2];
-    }
+    fitness[i*5+4] = c[2] = temp;
 }
 
-// __device__ double s_linear(double y, double a) {
-//     double tmp = fabs(y - a);
-//     return tmp / fabs(floor(a - y) + a);
-// }
+__device__ void mw11(double *position, int *position_dim, double *fitness, int i)
+{
+    double g=0, f0, f1, f02;
+
+    g = g3_mw(2, position_dim[0], position, i);
+
+    f0 = g*position[i*position_dim[0]+0];
+    f1 = g*sqrt(2-pow(f0/g, 2));
+
+    fitness[i*6+0] =  f0;
+    fitness[i*6+1] =  f1;
+
+    f02 = pow(f0,2);
+    fitness[i*6+2] = -1.0*(3.0-f02-f1)*(3.0-2.0*f02-f1);
+    fitness[i*6+3] = (3.0-0.625*f02-f1)*(3.0-7.0*f02-f1);
+    fitness[i*6+4] = -1.0*(1.62-0.18*f02-f1)*(1.125-0.125*f02-f1);
+    fitness[i*6+5] = (2.07-0.23*f02-f1)*(0.63-0.07*f02-f1);
+}
+
+// __device__ void mw12(double *position, int *position_dim, double *fitness, int i)
+// {
+//     double g=0, f0, f1, f02;
 //
-// __device__ double b_flat(double y, double a, double b, double c) {
-//     double tmp = 0.0;
+//     g = g1_mw(2, position_dim[0], position, i);
 //
-//     if (y > b && y < c) {
-//         return a;
-//     }
+//     f0 = g*position[i*position_dim[0]+0];
+//     f1 = g*sqrt(2-pow(f0/g, 2));
 //
-//     if (y <= b) {
-//         tmp = a * (b - y) / b;
-//     } else { // y >= c
-//         tmp = (1.0 - a) * (y - c) / (1.0 - c);
-//     }
+//     fitness[i*6+0] =  f0;
+//     fitness[i*6+1] =  f1;
 //
-//     return a + tmp;
-// }
-//
-// __device__ double b_poly(double y, double alpha) {
-//     return pow(y, alpha);
-// }
-//
-// __device__ double convex1(double *x) {
-//     double pi = 3.141592653589793;
-//     return 1.0 - cos(x[0] * pi / 2.0);
-// }
-//
-// __device__ double mixed_m(double *x, double alpha, double A) {
-//     double pi = 3.141592653589793;
-//     double tmp = cos(2.0 * pi * A * x[0] + pi / 2.0) / (2.0 * pi * A);
-//     return pow(1.0 - x[0] - tmp, alpha);
-// }
-//
-// __device__ void wfg1(double *position, int *position_dim, double *fitness, int i) {
-//     const int k = 4;
-//     const int M = 2;
-//
-//     double y[100];
-//     double x[M];
-//     double s[M] = {2.0, 4.0};
-//
-//     // Step 1: normalize
-//     for (int j = 0; j < position_dim[0]; j++) {
-//         double upper = 2.0 * (j + 1);
-//         y[j] = position[i * position_dim[0] + j] / upper;
-//     }
-//
-//     // Step 2: t1 - s_linear on y[k..n-1]
-//     for (int j = k; j < position_dim[0]; j++) {
-//         y[j] = s_linear(y[j], 0.35);
-//     }
-//
-//     // Step 3: t2 - b_flat on y[k..n-1]
-//     for (int j = k; j < position_dim[0]; j++) {
-//         y[j] = b_flat(y[j], 0.8, 0.75, 0.85);
-//     }
-//
-//     // Step 4: t3 - b_poly on all y
-//     for (int j = 0; j < position_dim[0]; j++) {
-//         y[j] = b_poly(y[j], 0.02);
-//     }
-//
-//     // Step 5: reduction - r_sum for two groups
-//
-//     // Group 1: j = 0..k-1
-//     double num = 0.0, denom = 0.0;
-//     for (int j = 0; j < k; j++) {
-//         double w = 2.0 * (j + 1);
-//         num += w * y[j];
-//         denom += w;
-//     }
-//     y[0] = num / denom;
-//
-//     // Group 2: j = k..n-1
-//     num = 0.0;
-//     denom = 0.0;
-//     for (int j = k; j < position_dim[0]; j++) {
-//         double w = 2.0 * (j + 1);
-//         num += w * y[j];
-//         denom += w;
-//     }
-//     y[1] = num / denom;
-//
-//     // Step 6: construct x
-//     x[0] = fmax(y[1], 1.0) * (y[0] - 0.5) + 0.5;
-//     x[1] = y[1];
-//
-//     // Step 7: compute objectives
-//     fitness[i * M + 0] = x[1] + s[0] * convex1(x);
-//     fitness[i * M + 1] = x[1] + s[1] * mixed_m(x, 1.0, 5.0);
+//     f02 = pow(f0,2);
+//     fitness[i*6+2] = -1.0*(3.0-f02-f1)*(3.0-2.0*f02-f1);
+//     fitness[i*6+3] = (3.0-0.625*f02-f1)*(3.0-7.0*f02-f1);
+//     fitness[i*6+4] = -1.0*(1.62-0.18*f02-f1)*(1.125-0.125*f02-f1);
+//     fitness[i*6+5] = (2.07-0.23*f02-f1)*(0.63-0.07*f02-f1);
 // }
 
-
-// my code
 __device__ double s_linear(double y, double a)
 {
     double temp, temp2;
     temp = floor(a-y);
     temp = temp+a;
-    temp = fabs(temp);
-    temp2 = fabs(y-a);
+    temp = abs(temp);
+    temp2 = abs(y-a);
     return temp2/temp;
 }
 
@@ -1057,14 +955,14 @@ __device__ double b_flat(double y, double a, double b, double c)
     temp = temp/b;
     temp2 = y-b;
     temp2 = floor(temp2);
-    temp2 = fmin(0.0, temp2);
+    temp2 = min(0.0, temp2);
     temp = temp*temp2;
 
     temp2 = (1.0-a)*(y-c);
     temp2 = temp2/(1.0-c);
     temp3 = c-y;
     temp3 = floor(temp3);
-    temp3 = fmin(0.0, temp3);
+    temp3 = min(0.0, temp3);
     temp2 = temp2*temp3;
 
     return a+temp-temp2;
@@ -1098,16 +996,28 @@ __device__ void wfg1(double *position, int *position_dim, double *fitness, int i
 //     int j, k=4, start, stop;
      int j, k=4, start, stop;
 
-//     for(j=0;j<10;j++)
-//     {
-//         position[0] = j*0.1;
-//     }
-
     for(j=0;j<position_dim[0];j++)
     {
         xu = (double)(j+1)*2.0;
         y[j] = position[i*position_dim[0]+j]/xu;
     }
+    printf("%i %lf %lf %lf %lf %lf\n",
+    i,
+    position[i*5+0],
+    position[i*5+1],
+    position[i*5+2],
+    position[i*5+3],
+    position[i*5+4]
+    );
+
+    printf("%i %lf %lf %lf %lf %lf\n",
+    i,
+    y[0],
+    y[1],
+    y[2],
+    y[3],
+    y[4]
+    );
 
 //     for(j=0;j<position_dim[0];j++)
 //     {
@@ -1129,25 +1039,15 @@ __device__ void wfg1(double *position, int *position_dim, double *fitness, int i
 //         printf("y4 = %0.2lf y5 = %0.2lf y6 = %0.2lf y7 = %0.2lf y8 = %0.2lf y9 = %0.2lf\n", y[4], y[5], y[6], y[7], y[8], y[9]);
 //     }
     for(j=k;j<position_dim[0];j++)
-//     for(j=0;j<k;j++)
     {
         y[j] =b_flat(y[j], 0.8, 0.75, 0.85);
     }
-//     if(i==0)
-//     {
-//         printf("y4 = %0.2lf y5 = %0.2lf y6 = %0.2lf y7 = %0.2lf y8 = %0.2lf y9 = %0.2lf\n", y[4], y[5], y[6], y[7], y[8], y[9]);
-//     }
+
     for(j=0;j<position_dim[0];j++)
     {
         y[j] =b_poly(y[j], 0.02);
     }
-//     if(i==0)
-//     {
-//         printf("y4 = %0.2lf y5 = %0.2lf y6 = %0.2lf y7 = %0.2lf y8 = %0.2lf y9 = %0.2lf\n", y[4], y[5], y[6], y[7], y[8], y[9]);
-//     }
 
-
-//     gap = (double)k/((double)m-1.0);
     temp = 0;
     temp2 = 0;
     start = 0;
@@ -1186,7 +1086,7 @@ __device__ void wfg1(double *position, int *position_dim, double *fitness, int i
 //         x[j] = fmax(y[1], a) * (y[j] - 0.5) + 0.5;
 //     }
     a = 1.0;
-    x[0] = fmax(y[1], a) * (y[0] - 0.5) + 0.5;
+    x[0] = max(y[1], a) * (y[0] - 0.5) + 0.5;
     x[1] = y[1];
 
 //     if(i==0)
