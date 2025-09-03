@@ -9,7 +9,7 @@ from optimisationMap import *
 import pickle
 
 # name_file = 'results.pkl'
-name_file = 'results_33_30sim_100iter_256pop_3posdim_3060.pkl'
+name_file = 'results_21_10sim_100iter_128pop_5posdim_3060.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
@@ -22,7 +22,7 @@ tam_pop = int(name_file.split('_')[4][:-3])
 print('sim', sim, 'tam_pop', tam_pop, 'pos_dim', pos_dim, 'name_problem', name_problem)
 
 if name_problem == 'wfg1':
-    problem = get_problem(name_problem, n_var=pos_dim, n_obj=2)
+    problem = get_problem(name_problem, n_var=pos_dim, k = 4, n_obj=2)
 else:
     problem = get_problem(name_problem, n_var = pos_dim)
 

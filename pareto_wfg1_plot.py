@@ -20,7 +20,7 @@ problem = WFG1(n_var=12, n_obj=dim, k=4)
 pymoo_par = problem.pareto_front()
 
 # meu programa
-name_file = 'testes/250825/results_21_100sim_100iter_128pop_12posdim_1.0alpha_4060.pkl'
+name_file = 'results_21_10sim_100iter_128pop_5posdim_3060.pkl'
 f = open(name_file, 'rb')
 results = pickle.load(f)
 f.close()

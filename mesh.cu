@@ -1095,7 +1095,8 @@ __device__ double mixed_m(double *x, double alpha, double a)
 __device__ void wfg1(double *position, int *position_dim, double *fitness, int i)
 {
     double y[100], xu, temp, x[2], s[2], temp2, a;
-    int j, k=4, start, stop;
+//     int j, k=4, start, stop;
+     int j, k=4, start, stop;
 
 //     for(j=0;j<10;j++)
 //     {
