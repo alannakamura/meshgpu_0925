@@ -22,8 +22,8 @@ f = open('wfg1.pkl', 'wb')
 
 # Problema
 problem = WFG1(n_var=n_var, n_obj=dim, k=4)
-problem.xl = np.zeros(n_var)
-problem.xu = np.array([2*(i+1) for i in range(n_var)])
+# problem.xl = np.zeros(n_var)
+# problem.xu = np.array([2*(i+1) for i in range(n_var)])
 
 pymoo_par = problem.pareto_front()
 ref = 5,5

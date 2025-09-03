@@ -16,7 +16,7 @@ f.close()
 
 # pareto
 dim = 2
-problem = WFG1(n_var=12, n_obj=dim, k=4)
+problem = WFG1(n_var=5, n_obj=dim, k=4)
 pymoo_par = problem.pareto_front()
 
 # meu programa
