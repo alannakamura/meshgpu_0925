@@ -13,7 +13,7 @@ from optimisationMap import *
 # name_file = 'testes/220725/versao1/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'testes/220725/versao2/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'results_1_10sim_50iter_256pop_3posdim_1.0alpha_3060.pkl'
-name_file = 'results_314_10sim_100iter_128pop_3posdim_3060.pkl'
+name_file = 'results_314_100sim_600iter_128pop_3posdim_5070_Ti.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
