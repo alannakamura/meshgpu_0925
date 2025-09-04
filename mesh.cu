@@ -978,7 +978,7 @@ __device__ void mw14(double *position, int *position_dim, double *fitness, int i
     fitness[i*4+2] =  f[2];
 
     alpha[0] = 1+f[0]+0.5*f2[0]+1.5*sin(1.1*M_PI*f2[0]);
-    alpha[0] = 1+f[1]+0.5*f2[1]+1.5*sin(1.1*M_PI*f2[1]);
+    alpha[1] = 1+f[1]+0.5*f2[1]+1.5*sin(1.1*M_PI*f2[1]);
 
     fitness[i*4+3] = -0.5*(12.2-alpha[0]-alpha[1])+f[2];
 }
