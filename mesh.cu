@@ -1205,6 +1205,10 @@ __device__ void function(int *func_n, double *position, int *position_dim,
         {
             mw10(position, position_dim, fitness, i, alpha);
         }
+        if(func_n[0] == 311)
+        {
+            mw11(position, position_dim, fitness, i);
+        }
     }
 }
 
@@ -3055,6 +3059,10 @@ __global__ void differential_mutation(int *func_n, int *xr_pool_type, int *tam_p
         if(func_n[0] == 310)
         {
             mw10(xst, tam_pos, xst_fitness, i, alpha);
+        }
+        if(func_n[0] == 311)
+        {
+            mw11(xst, tam_pos, xst_fitness, i);
         }
 
     //     verificar se xst domina a particula i
