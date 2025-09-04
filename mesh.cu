@@ -636,7 +636,7 @@ __device__ double g2_mw(int m, int n, double *position, int i)
 
 __device__ double g3_mw(int m, int n, double *position, int i)
 {
-    double g3 = 0.0, temp;
+    double g3, temp;
     int j;
 
     for(j=m-1;j<n;j++)
@@ -707,29 +707,32 @@ __device__ void mw3(double *position, int *position_dim, double *fitness, int i,
     fitness[i*4+3] = 0.85 - fitness[i*4+1] - fitness[i*4+0] + 0.3*pow(sin(0.75*M_PI*l), 2);
 }
 
-__device__ void mw4(double *position, int *position_dim, double *fitness, int i, double *alpha)
+__device__ void mw4(double *position, int *position_dim, double *fitness, int i)
 {
-    double g=0, l, c;
+    double g=0, l, f[3], temp;
 
     g = g1_mw(3, position_dim[0], position, i);
 
-    fitness[i*3+0] = g*(1-position[i*position_dim[0]+0])*(1-position[i*position_dim[0]+1]);
-    fitness[i*3+1] = g*position[i*position_dim[0]+1] * (1-position[i*position_dim[0]+0]);
-    fitness[i*3+2] = g*position[i*position_dim[0]+0];
+    f[0] =  1-position[i*position_dim[0]+0];
+    f[0] *= 1-position[i*position_dim[0]+1];
+    f[0] *= g;
 
-    l = fitness[i*3+2] - fitness[i*3+0] - fitness[i*3+1];
-    c = restricao(-0.4, 2.5, l, 1,  8);
-    c += 1;
-    c += fitness[i*3+0];
-    c += fitness[i*3+1];
-    c += fitness[i*3+2];
+    f[1] = 1-position[i*position_dim[0]+0];
+    f[1] *= g*position[i*position_dim[0]+1];
 
-    if(c>0)
-    {
-        fitness[i*3+0] += alpha[0]*c;
-        fitness[i*3+1] += alpha[0]*c;
-        fitness[i*3+2] += alpha[0]*c;
-    }
+    f[2] = g*position[i*position_dim[0]+0];
+
+    fitness[i*4+0] =  f[0];
+    fitness[i*4+1] =  f[1];
+    fitness[i*4+2] =  f[2];
+
+    l = f[2] - f[0] - f[1];
+
+    temp = sin(2.5*M_PI*l);
+    temp = 1.0+0.4*pow(temp, 8);
+    temp -= f[0]+f[1]+f[2];
+    fitness[i*4+3] = -1.0*temp;
+
 }
 
 __device__ void mw5(double *position, int *position_dim, double *fitness, int i, double *alpha)
@@ -811,6 +814,38 @@ __device__ void mw7(double *position, int *position_dim, double *fitness, int i,
     fitness[i*4+3] = pow(fitness[i*4+3], 2);
     fitness[i*4+3] -= fitness[i*4+0] * fitness[i*4+0];
     fitness[i*4+3] -= fitness[i*4+1] * fitness[i*4+1];
+
+}
+
+__device__ void mw8(double *position, int *position_dim, double *fitness, int i)
+{
+    double g=0, l, f[3], f2[3], temp;
+
+    g = g2_mw(3, position_dim[0], position, i);
+
+    f[0] =  cos(0.5*M_PI*position[i*position_dim[0]+0]);
+    f[0] *= cos(0.5*M_PI*position[i*position_dim[0]+1]);
+    f[0] *= g;
+
+    f[1] = cos(0.5*M_PI*position[i*position_dim[0]+0]);
+    f[1] *= g*sin(0.5*M_PI*position[i*position_dim[0]+1]);
+
+    f[2] = g*sin(0.5*M_PI*position[i*position_dim[0]+0]);
+
+    f2[0] = f[0]*f[0];
+    f2[1] = f[1]*f[1];
+    f2[2] = f[2]*f[2];
+
+    fitness[i*4+0] =  f[0];
+    fitness[i*4+1] =  f[1];
+    fitness[i*4+2] =  f[2];
+
+    l = asin(f[2]/sqrt(f2[0]+f2[1]+f2[2]));
+
+    temp = sin(6*l);
+    temp = pow(1.25-0.5*pow(temp, 2),2);
+    temp -= f2[0]+f2[1]+f2[2];
+    fitness[i*4+3] = -1.0*temp;
 
 }
 
@@ -963,7 +998,7 @@ __device__ void mw14(double *position, int *position_dim, double *fitness, int i
 {
     double g,f[3],f2[3], alpha[2];
 
-    g = g3_mw(2, position_dim[0], position, i);
+    g = g3_mw(3, position_dim[0], position, i);
 
     f[0] = position[i*position_dim[0]+0];
     f[1] = position[i*position_dim[0]+1];
@@ -1230,7 +1265,7 @@ __device__ void function(int *func_n, double *position, int *position_dim,
         }
         if(func_n[0] == 34)
         {
-            mw4(position, position_dim, fitness, i, alpha);
+            mw4(position, position_dim, fitness, i);
         }
         if(func_n[0] == 35)
         {
@@ -1243,6 +1278,10 @@ __device__ void function(int *func_n, double *position, int *position_dim,
         if(func_n[0] == 37)
         {
             mw7(position, position_dim, fitness, i, alpha);
+        }
+        if(func_n[0] == 38)
+        {
+            mw8(position, position_dim, fitness, i);
         }
         if(func_n[0] == 39)
         {
@@ -3097,7 +3136,7 @@ __global__ void differential_mutation(int *func_n, int *xr_pool_type, int *tam_p
         }
         if(func_n[0] == 34)
         {
-            mw4(xst, tam_pos, xst_fitness, i, alpha);
+            mw4(xst, tam_pos, xst_fitness, i);
         }
         if(func_n[0] == 35)
         {
@@ -3110,6 +3149,10 @@ __global__ void differential_mutation(int *func_n, int *xr_pool_type, int *tam_p
         if(func_n[0] == 37)
         {
             mw7(xst, tam_pos, xst_fitness, i, alpha);
+        }
+        if(func_n[0] == 38)
+        {
+            mw8(xst, tam_pos, xst_fitness, i);
         }
         if(func_n[0] == 39)
         {

@@ -81,7 +81,7 @@ for func_n in [int(problem)]:
     max_fitness_eval = -1
     position_dim = pos_dim
     if func_n in [1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 16,
-                  31, 32, 33, 34, 35, 37, 39, 310, 312]:
+                  31, 32, 33, 34, 35, 37, 38, 39, 310, 312]:
         position_max_value = [1] * position_dim
         # position_min_value = [1e-6] * position_dim
         position_min_value = [0] * position_dim
@@ -112,7 +112,7 @@ for func_n in [int(problem)]:
         position_max_value = []
         position_min_value = []
 
-    if func_n in [31, 32, 36, 39, 314]:
+    if func_n in [31, 32, 34, 36, 38, 39, 314]:
         restrictions_dim = 1
     elif func_n in [33, 37, 312, 313]:
         restrictions_dim = 2
