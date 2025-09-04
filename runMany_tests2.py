@@ -17,7 +17,7 @@ for j in range(len(problem)):
     GPU = '_'.join(GPU[3:])
 
     num = 100
-    iterations = 300
+    iterations = 600
     population = 128
     pos_dim = 3
     f = open('results.pkl', 'wb')
