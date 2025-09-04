@@ -88,7 +88,7 @@ for func_n in [int(problem)]:
     elif func_n in [36]:
         position_max_value = [1.1] * position_dim
         position_min_value = [0] * position_dim
-    elif func_n in [313]:
+    elif func_n in [313, 314]:
         position_max_value = [1.5] * position_dim
         position_min_value = [0] * position_dim
     elif func_n in [14]:
@@ -112,7 +112,7 @@ for func_n in [int(problem)]:
         position_max_value = []
         position_min_value = []
 
-    if func_n in [31, 32, 36, 39]:
+    if func_n in [31, 32, 36, 39, 314]:
         restrictions_dim = 1
     elif func_n in [33, 37, 312, 313]:
         restrictions_dim = 2

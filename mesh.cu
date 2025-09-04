@@ -917,24 +917,71 @@ __device__ void mw11(double *position, int *position_dim, double *fitness, int i
     fitness[i*6+5] = (2.07-0.23*f02-f1)*(0.63-0.07*f02-f1);
 }
 
-// __device__ void mw12(double *position, int *position_dim, double *fitness, int i)
-// {
-//     double g=0, f0, f1, f02;
-//
-//     g = g1_mw(2, position_dim[0], position, i);
-//
-//     f0 = g*position[i*position_dim[0]+0];
-//     f1 = g*sqrt(2-pow(f0/g, 2));
-//
-//     fitness[i*6+0] =  f0;
-//     fitness[i*6+1] =  f1;
-//
-//     f02 = pow(f0,2);
-//     fitness[i*6+2] = -1.0*(3.0-f02-f1)*(3.0-2.0*f02-f1);
-//     fitness[i*6+3] = (3.0-0.625*f02-f1)*(3.0-7.0*f02-f1);
-//     fitness[i*6+4] = -1.0*(1.62-0.18*f02-f1)*(1.125-0.125*f02-f1);
-//     fitness[i*6+5] = (2.07-0.23*f02-f1)*(0.63-0.07*f02-f1);
-// }
+__device__ void mw12(double *position, int *position_dim, double *fitness, int i)
+{
+    double g=0, f0, f1, T[4];
+
+    g = g1_mw(2, position_dim[0], position, i);
+
+    f0 = g*position[i*position_dim[0]+0];
+    f1 = g*(0.85-0.8*f0/g-0.08*abs(sin(3.2*M_PI*f0/g)));
+
+    fitness[i*4+0] =  f0;
+    fitness[i*4+1] =  f1;
+
+    T[0] = 1-0.8*f0-f1+0.08*sin(2*M_PI*(f1-f0/1.5));
+    T[1] = 1-0.625*f0-f1+0.08*sin(2*M_PI*(f1-f0/1.6));
+    T[2] = 1.4-0.875*f0-f1+0.08*sin(2*M_PI*(f1/1.4-f0/1.6));
+    T[3] = 1.8-1.125*f0-f1+0.08*sin(2*M_PI*(f1/1.8-f0/1.6));
+
+    fitness[i*4+2] = T[0]*T[3];
+    fitness[i*4+3] = -1*T[1]*T[2];
+}
+
+__device__ void mw13(double *position, int *position_dim, double *fitness, int i)
+{
+    double g=0, f0, f1, T[4];
+
+    g = g2_mw(2, position_dim[0], position, i);
+
+    f0 = g*position[i*position_dim[0]+0];
+    f1 = g*(5-exp(f0/g)-0.5*abs(sin(3*M_PI*f0/g)));
+
+    fitness[i*4+0] =  f0;
+    fitness[i*4+1] =  f1;
+
+    T[0] = 5.0-exp(f0)-0.5*sin(3*M_PI*f0)-f1;
+    T[1] = 5.0-(1+f0+0.5*f0*f0)-0.5*sin(3*M_PI*f0)-f1;
+    T[2] = 5.0-(1.0+0.7*f0)-0.5*sin(3*M_PI*f0)-f1;
+    T[3] = 5.0-(1.0+0.4*f0)-0.5*sin(3*M_PI*f0)-f1;
+
+    fitness[i*4+2] = T[0]*T[3];
+    fitness[i*4+3] = -1*T[1]*T[2];
+}
+
+__device__ void mw14(double *position, int *position_dim, double *fitness, int i)
+{
+    double g,f[3],f2[3], alpha[2];
+
+    g = g3_mw(2, position_dim[0], position, i);
+
+    f[0] = position[i*position_dim[0]+0];
+    f[1] = position[i*position_dim[0]+1];
+
+    f2[0] = pow(f[0],2);
+    f2[1] = pow(f[1],2);
+
+    f[2] = g/2*(6-exp(f[0])-1.5*sin(1.1*M_PI*f2[0]) + 6-exp(f[1])-1.5*sin(1.1*M_PI*f2[1]));
+
+    fitness[i*4+0] =  f[0];
+    fitness[i*4+1] =  f[1];
+    fitness[i*4+2] =  f[2];
+
+    alpha[0] = 1+f[0]+0.5*f2[0]+1.5*sin(1.1*M_PI*f2[0]);
+    alpha[0] = 1+f[1]+0.5*f2[1]+1.5*sin(1.1*M_PI*f2[1]);
+
+    fitness[i*4+3] = -0.5*(12.2-alpha[0]-alpha[1])+f[2];
+}
 
 __device__ double s_linear(double y, double a)
 {
@@ -1208,6 +1255,18 @@ __device__ void function(int *func_n, double *position, int *position_dim,
         if(func_n[0] == 311)
         {
             mw11(position, position_dim, fitness, i);
+        }
+        if(func_n[0] == 312)
+        {
+            mw12(position, position_dim, fitness, i);
+        }
+        if(func_n[0] == 313)
+        {
+            mw13(position, position_dim, fitness, i);
+        }
+        if(func_n[0] == 314)
+        {
+            mw14(position, position_dim, fitness, i);
         }
     }
 }
@@ -3063,6 +3122,18 @@ __global__ void differential_mutation(int *func_n, int *xr_pool_type, int *tam_p
         if(func_n[0] == 311)
         {
             mw11(xst, tam_pos, xst_fitness, i);
+        }
+        if(func_n[0] == 312)
+        {
+            mw12(xst, tam_pos, xst_fitness, i);
+        }
+        if(func_n[0] == 313)
+        {
+            mw13(xst, tam_pos, xst_fitness, i);
+        }
+        if(func_n[0] == 314)
+        {
+            mw14(xst, tam_pos, xst_fitness, i);
         }
 
     //     verificar se xst domina a particula i

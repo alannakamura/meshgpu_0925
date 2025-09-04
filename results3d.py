@@ -13,7 +13,7 @@ from optimisationMap import *
 # name_file = 'testes/220725/versao1/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'testes/220725/versao2/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'results_1_10sim_50iter_256pop_3posdim_1.0alpha_3060.pkl'
-name_file = 'results_4_100sim_50iter_128pop_3posdim_1.0alpha_5070_Ti.pkl'
+name_file = 'results_314_100sim_100iter_128pop_3posdim_3060.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
@@ -44,7 +44,7 @@ for i in range(sim):
     result = results[i]
     lenMem.append(result[2][0])
     fim = tam_pop*2 + result[2][0]
-    fit.append(np.array(result[1][tam_pop * 2:fim]))
+    fit.append(np.array(result[1][tam_pop * 2:fim,:3]))
 
 fit2 = fit[0]
 
