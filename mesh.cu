@@ -1008,6 +1008,8 @@ __device__ void mw14(double *position, int *position_dim, double *fitness, int i
 
     f[2] = g/2*(6-exp(f[0])-1.5*sin(1.1*M_PI*f2[0]) + 6-exp(f[1])-1.5*sin(1.1*M_PI*f2[1]));
 
+    //printf("%d %lf %lf %lf\n",i,f[0],f[1],f[2]);
+
     fitness[i*4+0] =  f[0];
     fitness[i*4+1] =  f[1];
     fitness[i*4+2] =  f[2];

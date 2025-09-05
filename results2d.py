@@ -9,7 +9,7 @@ from optimisationMap import *
 import pickle
 
 # name_file = 'results.pkl'
-name_file = 'results_313_100sim_00iter_128pop_3posdim_3060.pkl'
+name_file = 'results_311_100sim_100iter_128pop_3posdim_5070_Ti.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
