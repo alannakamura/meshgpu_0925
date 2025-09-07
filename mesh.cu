@@ -1084,17 +1084,27 @@ __device__ void wfg1(double *position, int *position_dim, double *fitness, int i
     {
         xu = (double)(j+1)*2.0;
         y[j] = position[i*position_dim[0]+j]/xu;
+        printf("%d %lf %lf %lf\n",j,position[i*position_dim[0]+j], xu, y[j]);
     }
-//     printf("%i %lf %lf %lf %lf %lf\n",
+//      printf("xu %i %lf %lf %lf %lf %lf\n",
 //     i,
-//     position[i*5+0],
+//     xu[0],
+//     xu[1],
+//     xu[2],
+//     xu[3],
+//     xu[4]
+//     );
+//
+//       printf("p %i %lf %lf %lf %lf %lf\n",
+//     i,
+//     position[i*5,0],
 //     position[i*5+1],
 //     position[i*5+2],
 //     position[i*5+3],
 //     position[i*5+4]
 //     );
 //
-//     printf("%i %lf %lf %lf %lf %lf\n",
+//     printf("y %i %lf %lf %lf %lf %lf\n",
 //     i,
 //     y[0],
 //     y[1],
