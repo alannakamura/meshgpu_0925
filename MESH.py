@@ -521,6 +521,7 @@ class MESH:
         cuda.memcpy_htod(self.seed_g, np.random.randint(0, int(1e9), dtype=np.int32))
 
         init_population = self.mod.get_function("init_population")
+        # init_population = self.mod.get_function("init_population_test")
         init_population(self.position_g, self.params.position_dim_g,self.seed_g,
                         self.params.position_min_value_g, self.params.position_max_value_g,
                         self.params.population_size_g,
@@ -1695,6 +1696,18 @@ class MESH:
                 cuda.Context.synchronize()
                 self.fitness_eval_count += self.params.population_size
                 self.update_personal_best_gpu()
+
+            # teste2 = np.zeros(self.params.population_size*self.params.position_dim,
+            #                   dtype=np.float64)
+            # cuda.memcpy_dtoh(teste2, self.position_g)
+            # teste2.shape = self.params.population_size, self.params.position_dim
+            # print(teste2)
+            #
+            # teste = np.zeros(self.params.population_size* self.params.objectives_dim[0],
+            # dtype=np.float64)
+            # cuda.memcpy_dtoh(teste, self.fitness_g)
+            # teste.shape = self.params.population_size ,self.params.objectives_dim[0]
+            # print(teste)
 
             if self.gpu:
                 # div = int(self.params.population_size/16)

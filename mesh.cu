@@ -1083,8 +1083,9 @@ __device__ void wfg1(double *position, int *position_dim, double *fitness, int i
     for(j=0;j<position_dim[0];j++)
     {
         xu = (double)(j+1)*2.0;
+//         xu = 1.0;
         y[j] = position[i*position_dim[0]+j]/xu;
-        printf("%d %lf %lf %lf\n",j,position[i*position_dim[0]+j], xu, y[j]);
+//         printf("j=%d p[j]=%lf xu=%lf y[j]=%lf\n",j,position[i*position_dim[0]+j], xu, y[j]);
     }
 //      printf("xu %i %lf %lf %lf %lf %lf\n",
 //     i,
@@ -1128,14 +1129,15 @@ __device__ void wfg1(double *position, int *position_dim, double *fitness, int i
     {
         y[j] = s_linear(y[j], 0.35);
     }
-//     if(i==0)
-//     {
-//         printf("y4 = %0.2lf y5 = %0.2lf y6 = %0.2lf y7 = %0.2lf y8 = %0.2lf y9 = %0.2lf\n", y[4], y[5], y[6], y[7], y[8], y[9]);
-//     }
+
+//     printf("i = %d y[0] = %0.6lf y1 = %0.6lf y2 = %0.6lf y3 = %0.6lf y4 = %0.6lf\n",
+//     i, y[0], y[1], y[2], y[3], y[4]);
     for(j=k;j<position_dim[0];j++)
     {
         y[j] =b_flat(y[j], 0.8, 0.75, 0.85);
     }
+//     printf("i = %d y[0] = %0.6lf y1 = %0.6lf y2 = %0.6lf y3 = %0.6lf y4 = %0.6lf\n",
+//     i, y[0], y[1], y[2], y[3], y[4]);
 
     for(j=0;j<position_dim[0];j++)
     {
@@ -3949,6 +3951,29 @@ __global__ void init_population(double *position, int *position_dim, int *seed, 
     {
         position[i*position_dim[0]+j] = curand_uniform(&state);
         position[i*position_dim[0]+j] = position[i*position_dim[0]+j]*(max[j]-min[j])+min[j];
+    }
+}
+
+__global__ void init_population_test(double *position, int *position_dim, int *seed, double *min,
+ double *max, int *population_size)
+{
+    int i = blockIdx.x*blockDim.x+threadIdx.x;
+    int j = blockIdx.y*blockDim.y+threadIdx.y, k;
+
+    if(i == 0 && j < position_dim[0])
+    {
+        for(k=0;k<position_dim[0];k++)
+        {
+            position[i*position_dim[0]+j] = 0;
+        }
+    }
+    if(i == 1 && j < position_dim[0])
+    {
+        position[i*position_dim[0]+j] = j+1;
+    }
+    if(i == 2 && j < position_dim[0])
+    {
+      position[i*position_dim[0]+j] = 2*(j+1);
     }
 }
 

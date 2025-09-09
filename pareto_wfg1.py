@@ -32,7 +32,7 @@ res1 = hv1.compute(ref)
 print(res1)
 
 # Parada
-termination = get_termination("n_gen", 30)
+termination = get_termination("n_gen", 200)
 
 X = np.random.rand(128, n_var)  # None funciona pois só queremos amostrar
 # Escala para [0, 2*(i+1)]

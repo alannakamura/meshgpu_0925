@@ -16,10 +16,10 @@ for j in range(len(problem)):
     GPU = cuda.Device(0).name().split()
     GPU = '_'.join(GPU[3:])
 
-    num = 1
-    iterations = 1
-    population = 4
-    pos_dim = 12
+    num = 10
+    iterations = 100
+    population = 128
+    pos_dim = 5
     f = open('results.pkl', 'wb')
     results = {'count': -1, 'cpu': [], 'gpu': [], 'problem': problem[j],
                'pos_dim': pos_dim, 'gpu2':[]}
