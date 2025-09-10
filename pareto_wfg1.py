@@ -63,96 +63,96 @@ for i in range(30):
     s.add(l[-1][0])
     c = np.concatenate((c, res.F), axis=0)
 
-# # MOEAD
-# for i in range(30):
-#     # Gerar os vetores de referência com método das divisões uniformes
-#     ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
-#     a = len(ref_dirs)
-#
-#     algorithm = MOEAD(
-#         ref_dirs=ref_dirs,
-#     )
-#
-#     res = minimize(
-#         problem,
-#         algorithm,
-#         termination,
-#         seed=i+100,
-#         verbose=True
-#     )
-#
-#     l.append((res.F, res.X))
-#     s.add(l[-1][0])
-#     c = np.concatenate((c, res.F), axis=0)
-#     pass
-#
-# for i in range(30):
-#     # Gerar os vetores de referência com método das divisões uniformes
-#     ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
-#
-#     # Criar algoritmo NSGA-III
-#     algorithm = NSGA3(
-#         ref_dirs=ref_dirs,
-#         pop_size=128,
-#     )
-#
-#     res = minimize(
-#         problem,
-#         algorithm,
-#         termination,
-#         seed=i+200,
-#         verbose=True
-#     )
-#
-#     l.append((res.F, res.X))
-#     s.add(l[-1][0])
-#     c = np.concatenate((c, res.F), axis=0)
-#     pass
-#
-# for i in range(30):
-#
-#     # Gerar 100 vetores de referência usando 99 partições
-#     ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
-#
-#     # Configurar o algoritmo RVEA
-#     algorithm = RVEA(
-#         ref_dirs=ref_dirs,
-#     )
-#
-#     # Executar otimização
-#     res = minimize(
-#         problem,
-#         algorithm,
-#         termination,
-#         seed=i+300,
-#         verbose=True
-#     )
-#
-#     l.append((res.F, res.X))
-#     s.add(l[-1][0])
-#     c = np.concatenate((c, res.F), axis=0)
-#     pass
-#
-# # SPEA-2
-# for i in range(30):
-#     # Algoritmo
-#     algorithm = SPEA2(
-#         pop_size=128,
-#     )
-#
-#     # Otimização
-#     res = minimize(
-#         problem,
-#         algorithm,
-#         termination,
-#         seed=i+400,
-#         verbose=True
-#     )
-#
-#     l.append((res.F, res.X))
-#     s.add(l[-1][0])
-#     c = np.concatenate((c, res.F), axis=0)
-#     pass
+# MOEAD
+for i in range(30):
+    # Gerar os vetores de referência com método das divisões uniformes
+    ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
+    a = len(ref_dirs)
+
+    algorithm = MOEAD(
+        ref_dirs=ref_dirs,
+    )
+
+    res = minimize(
+        problem,
+        algorithm,
+        termination,
+        seed=i+100,
+        verbose=True
+    )
+
+    l.append((res.F, res.X))
+    s.add(l[-1][0])
+    c = np.concatenate((c, res.F), axis=0)
+    pass
+
+for i in range(30):
+    # Gerar os vetores de referência com método das divisões uniformes
+    ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
+
+    # Criar algoritmo NSGA-III
+    algorithm = NSGA3(
+        ref_dirs=ref_dirs,
+        pop_size=128,
+    )
+
+    res = minimize(
+        problem,
+        algorithm,
+        termination,
+        seed=i+200,
+        verbose=True
+    )
+
+    l.append((res.F, res.X))
+    s.add(l[-1][0])
+    c = np.concatenate((c, res.F), axis=0)
+    pass
+
+for i in range(30):
+
+    # Gerar 100 vetores de referência usando 99 partições
+    ref_dirs = get_reference_directions("das-dennis", 2, n_partitions=99)
+
+    # Configurar o algoritmo RVEA
+    algorithm = RVEA(
+        ref_dirs=ref_dirs,
+    )
+
+    # Executar otimização
+    res = minimize(
+        problem,
+        algorithm,
+        termination,
+        seed=i+300,
+        verbose=True
+    )
+
+    l.append((res.F, res.X))
+    s.add(l[-1][0])
+    c = np.concatenate((c, res.F), axis=0)
+    pass
+
+# SPEA-2
+for i in range(30):
+    # Algoritmo
+    algorithm = SPEA2(
+        pop_size=128,
+    )
+
+    # Otimização
+    res = minimize(
+        problem,
+        algorithm,
+        termination,
+        seed=i+400,
+        verbose=True
+    )
+
+    l.append((res.F, res.X))
+    s.add(l[-1][0])
+    c = np.concatenate((c, res.F), axis=0)
+    pass
 
 fronts = pg.fast_non_dominated_sorting(points=c)[0]
 c = c[fronts[0]]
