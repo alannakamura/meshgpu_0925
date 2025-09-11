@@ -1,0 +1,196 @@
+###########################################################################
+# Lucas Braga, MS.c. (email: lucas.braga.deo@gmail.com )
+# Gabriel Matos Leite, PhD candidate (email: gmatos@cos.ufrj.br)
+# Carolina Marcelino, PhD (email: carolimarc@ic.ufrj.br)
+# June 16, 2021
+###########################################################################
+# Copyright (c) 2021, Lucas Braga, Gabriel Matos Leite, Carolina Marcelino
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+#    * Redistributions of source code must retain the above copyright
+#      notice, this list of conditions and the following disclaimer.
+#    * Redistributions in binary form must reproduce the above copyright
+#      notice, this list of conditions and the following disclaimer in
+#      the documentation and/or other materials provided with the
+#      distribution
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS USING
+# THE CREATIVE COMMONS LICENSE: CC BY-NC-ND "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+from objectives import *
+from MESH import *
+from pathlib import Path
+from optimisationMap import *
+import pickle
+from tqdm import tqdm
+import os
+import pycuda.driver as cuda
+
+# problem = [14]
+problem = [31,32,33,34,35,36,37,38,39,310,311,312,313,314]
+# problem = [11,12,13,14,16]
+# problem = [4,7,1,2,3,5,6]
+
+alpha = 0.0
+cuda.init()
+GPU = cuda.Device(0).name().split()
+GPU = '_'.join(GPU[3:])
+
+for j in range(len(problem)):
+    print('problem', problem[j])
+
+    simulations = 100
+    iterations = 100
+    population_size = 128
+    position_dim = 5
+    max_iterations = -1
+    max_fitness_eval = -1
+
+    print('simulations', simulations, 'iterations', iterations, 'population', population_size,
+          'pos_dim', position_dim)
+
+    f = open('results.pkl', 'wb')
+    results = {'count': -1, 'cpu': [], 'gpu': [], 'problem': problem[j],
+               'pos_dim': position_dim, 'gpu2':[]}
+    pickle.dump(results, f)
+    f.close()
+
+    for i in tqdm(range(simulations)):
+        print('simulation ', i+1, (i + 1) / simulations * 100, '%')
+
+        # os.system("python run2.py "+str(problem[j]) + ' ' +
+        #           str(iterations)+ ' ' + str(population) + ' '+ str(alpha)+ ' '+
+        #           str(pos_dim))
+
+        Path("result").mkdir(parents=False, exist_ok=True)
+
+        for func_n in [int(problem[j])]:
+            func_name = optimisationMap[func_n]
+
+            num_runs = 1
+            if (11 <= func_n <= 16
+                    or 21 <= func_n <= 21
+                    or 31 <= func_n <= 33
+                    or 35 <= func_n <= 37
+                    or 39 <= func_n <= 313):
+                objectives_dim = 2
+            elif func_n in [1, 2, 3, 4, 5, 6, 7, 34, 38, 314]:
+                objectives_dim = 3
+            else:
+                objectives_dim = -1
+            func = get_function(func_n, objectives_dim)
+
+            otimizations_type = [False] * objectives_dim
+            if func_n in [1, 2, 3, 4, 5, 6, 7, 11, 12, 13, 16,
+                          31, 32, 33, 34, 35, 37, 38, 39, 310, 312]:
+                position_max_value = [1] * position_dim
+                # position_min_value = [1e-6] * position_dim
+                position_min_value = [0] * position_dim
+            elif func_n in [36]:
+                position_max_value = [1.1] * position_dim
+                position_min_value = [0] * position_dim
+            elif func_n in [313, 314]:
+                position_max_value = [1.5] * position_dim
+                position_min_value = [0] * position_dim
+            elif func_n in [14]:
+                position_max_value = [10] * position_dim
+                position_min_value = [-10] * position_dim
+                position_max_value[0] = 1
+                position_min_value[0] = 0
+            elif func_n in [15]:
+                position_max_value = [2 ** 5 - 1] * position_dim
+                position_min_value = [0] * position_dim
+                position_max_value[0] = 2 ** 30 - 1
+            elif func_n == 21:
+                position_max_value = [0] * position_dim
+                position_min_value = [0] * position_dim
+                for i in range(position_dim):
+                    position_max_value[i] = 2 * (i + 1)
+            elif func_n == 311:
+                position_min_value = [0] * position_dim
+                position_max_value = [np.sqrt(2.0)] * position_dim
+            else:
+                position_max_value = []
+                position_min_value = []
+
+            if func_n in [31, 32, 34, 36, 38, 39, 314]:
+                restrictions_dim = 1
+            elif func_n in [33, 37, 312, 313]:
+                restrictions_dim = 2
+            elif func_n in [35, 310]:
+                restrictions_dim = 3
+            elif func_n in [311]:
+                restrictions_dim = 4
+            else:
+                restrictions_dim = 0
+
+            memory_size = population_size
+            memory_update_type = 0
+
+            communication_probability = 0.7  # 0.5
+            mutation_rate = 0.9
+            personal_guide_array_size = 3
+
+            global_best_attribution_type = 1  # 0 -> E1 | 1 -> E2 | 2 -> E3 | 3 -> E4
+            Xr_pool_type = 1  # 0 ->  V1 | 1 -> V2 | 2 -> V3
+            DE_mutation_type = 0  # 0 -> DE\rand\1\Bin | 1 -> DE\rand\2\Bin | 2 -> DE/Best/1/Bin | 3 -> DE/Current-to-best/1/Bin | 4 -> DE/Current-to-rand/1/Bin
+            crowd_distance_type = 0  # 0 -> Crowding Distance Tradicional | 1 -> Crowding Distance Suganthan
+
+            config = f"E{global_best_attribution_type + 1}V{Xr_pool_type + 1}D{DE_mutation_type + 1}C{crowd_distance_type + 1}"
+
+            print(
+                f"Running E{global_best_attribution_type + 1}V{Xr_pool_type + 1}D{DE_mutation_type + 1}C{crowd_distance_type + 1} on {optimisationMap[func_n]}")
+
+            print('problem', problem[j], optimisationMap[problem[j]], 'iterations', iterations)
+
+            for _ in tqdm(range(num_runs)):
+                params = MESH_Params(objectives_dim, otimizations_type, max_iterations,
+                                     max_fitness_eval, position_dim, position_max_value,
+                                     position_min_value, population_size, memory_size,
+                                     memory_update_type, global_best_attribution_type,
+                                     DE_mutation_type, Xr_pool_type, crowd_distance_type,
+                                     communication_probability, mutation_rate, personal_guide_array_size,
+                                     restrictions_dim=restrictions_dim, func_n=func_n)
+
+                start = dt.now()
+
+                # MCDEEPSO = MESH(params, func)
+                MCDEEPSO = MESH(params, func, max_num_iters=iterations, alpha=alpha)
+                MCDEEPSO.log_memory = f"result/{config}C1_{i}-{optimisationMap[func_n]}-{objectives_dim}obj-"
+
+                gpu = MCDEEPSO.run(func_name, False, False)
+                gpu2 = (dt.now() - start).total_seconds()
+
+                f = open('results.pkl', 'rb')
+                results = pickle.load(f)
+                f.close()
+
+                f = open('results.pkl', 'wb')
+                results['gpu'].append(sum(gpu))
+                results['gpu2'].append(gpu2)
+                pickle.dump(results, f)
+                f.close()
+
+    alpha2 = str(alpha).split('.')
+    os.rename('results.pkl', 'results_' + str(problem[j]) + '_'
+              + str(simulations) +'sim_'
+              + str(iterations) +'iter_'
+              + str(population_size) +'pop_'
+              + str(position_dim) +'posdim_'
+              + GPU +'_teste.pkl')
+
+
