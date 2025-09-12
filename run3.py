@@ -40,8 +40,8 @@ from tqdm import tqdm
 import os
 import pycuda.driver as cuda
 
-# problem = [14]
-problem = [31,32,33,34,35,36,37,38,39,310,311,312,313,314]
+problem = [314]
+# problem = [31,32,33,34,35,36,37,38,39,310,311,312,313,314]
 # problem = [11,12,13,14,16]
 # problem = [4,7,1,2,3,5,6]
 
