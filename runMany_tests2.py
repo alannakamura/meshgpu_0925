@@ -3,12 +3,11 @@ from tqdm import tqdm
 import os
 import pycuda.driver as cuda
 
-problem = [21]
-#problem = [31,32,33,34,35,36,37,38,39,310,311,312,313,314]
+# problem = [21]
+problem = [31,32,33,34,35,36,37,38,39,310,311,312,313,314]
 # problem = [11,12,13,14,16]
 # problem = [4,7,1,2,3,5,6]
 #problem = [31, 32, 33, 35, 36, 37]
-alpha = [2.0]*len(problem)
 for j in range(len(problem)):
     print('problem', problem[j])
 
@@ -29,10 +28,10 @@ for j in range(len(problem)):
     for i in tqdm(range(num)):
         print('simulation ', i+1, (i + 1) / num * 100, '%')
         os.system("python run2.py "+str(problem[j]) + ' ' +
-                  str(iterations)+ ' ' + str(population) + ' '+ str(alpha[j])+ ' '+
+                  str(iterations)+ ' ' + str(population) + ' '+ str(0.0)+ ' '+
                   str(pos_dim))
 
-    alpha2 = str(alpha[j]).split('.')
+    # alpha2 = str(alpha[j]).split('.')
     os.rename('results.pkl', 'results_' + str(problem[j]) + '_'
               + str(num) +'sim_'
               + str(iterations) +'iter_'
