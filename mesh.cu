@@ -1357,7 +1357,7 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
 {
     int obj_dim = dim[2];
     int total_dim = dim[0];
-    double tol = 1e-2;
+    double tol = 1e-3;
 
     int inviavel1 = 0, inviavel2 = 0;
     double violacao_total1 = 0.0, violacao_total2 = 0.0;

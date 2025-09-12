@@ -8,12 +8,12 @@ import numpy as np
 import pandas as pd
 from optimisationMap import *
 
-# name_file = 'results.pkl'if(diff == tam[0])
+# name_file = 'results.pkl'
 # name_file = 'results_1_100sim_30iter_128pop_3posdim_1.0alpha_3060_1.pkl'
 # name_file = 'testes/220725/versao1/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'testes/220725/versao2/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'results_1_10sim_50iter_256pop_3posdim_1.0alpha_3060.pkl'
-name_file = 'testes20250911/results_314_1sim_100iter_128pop_3posdim_5070_Ti.pkl'
+name_file = 'results_34_100sim_50iter_128pop_5posdim_3060.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
