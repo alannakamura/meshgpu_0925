@@ -690,7 +690,8 @@ __device__ void mw2(double *position, int *position_dim, double *fitness, int i,
     fitness[i*3+1] =  g - fitness[i*3+0];
 
     l = sqrt(2.0)*(fitness[i*3+1] - fitness[i*3+0]);
-    fitness[i*3+2] = fitness[i*3+1] + fitness[i*3+0] -1 - 0.5*pow(sin(3*M_PI*l), 8);
+    fitness[i*3+2] =
+    fitness[i*3+1] + fitness[i*3+0] -1 - 0.5*pow(sin(3*M_PI*l), 8);
 }
 
 __device__ void mw3(double *position, int *position_dim, double *fitness, int i, double *alpha)
@@ -1356,21 +1357,25 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
 {
     int obj_dim = dim[2];
     int total_dim = dim[0];
-//     double tol = 1e-3;
+    double tol = 1e-2;
 
     int inviavel1 = 0, inviavel2 = 0;
     double violacao_total1 = 0.0, violacao_total2 = 0.0;
 
     // Verifica restrições: positiva → inviável
     for (int j = obj_dim; j < total_dim; j++) {
-        if (fitness1[j] > 0.0) {
+//         if (fitness1[j] > 0.0)
+    if (fitness1[j] > tol)
+        {
             inviavel1 = 1;
             break;
         }
     }
 
     for (int j = obj_dim; j < total_dim; j++) {
-        if (fitness2[j] > 0.0) {
+//         if(fitness2[j] > 0.0)
+        if(fitness2[j] > tol)
+        {
             inviavel2 = 1;
             break;
         }
@@ -1384,9 +1389,12 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
 
     // Caso 3: ambos inviáveis → compara soma das violações
     if (inviavel1 == 1 && inviavel2 == 1) {
-        for (int j = obj_dim; j < total_dim; j++) {
-            if (fitness1[j] > 0.0) violacao_total1 += fitness1[j];
-            if (fitness2[j] > 0.0) violacao_total2 += fitness2[j];
+        for (int j = obj_dim; j < total_dim; j++)
+        {
+//             if (fitness1[j] > 0.0) violacao_total1 += fitness1[j];
+//             if (fitness2[j] > 0.0) violacao_total2 += fitness2[j];
+            if (fitness1[j] > tol) violacao_total1 += fitness1[j];
+            if (fitness2[j] > tol) violacao_total2 += fitness2[j];
         }
         return (violacao_total1 < violacao_total2) ? 1 : 0;
     }
@@ -1394,6 +1402,7 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
     // Caso 4: ambos viáveis → dominância pareto
     int domina = 0;
     for (int i = 0; i < obj_dim; i++) {
+//         se minimzacao
         if (maximize[i] == 0) {
             if (fitness1[i] > fitness2[i]) return 0;
             if (fitness1[i] < fitness2[i]) domina = 1;
