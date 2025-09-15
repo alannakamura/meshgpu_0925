@@ -613,7 +613,7 @@ __device__ double g1_mw(int m, int n, double *position, int i)
 
 __device__ double g2_mw(int m, int n, double *position, int i)
 {
-    double g2 = 0, temp, z, pi = 3.14159265358979323846;
+    double g2 = 0, temp, z;
     int j;
 
     for(j=m-1;j<n;j++)
@@ -627,7 +627,7 @@ __device__ double g2_mw(int m, int n, double *position, int i)
 
         temp = z * z * 0.1;
         temp = temp/((double)n);
-        temp = temp - 1.5*cos(2*pi*z);
+        temp = temp - 1.5*cos(2*M_PI*z);
         temp = temp + 1.5;
         g2 = g2 + temp;
     }
@@ -853,36 +853,38 @@ __device__ void mw8(double *position, int *position_dim, double *fitness, int i)
 __device__ void mw9(double *position, int *position_dim, double *fitness, int i,
 double *alpha)
 {
-    double g, T[3], f0, f1;
+    double g, T[3], f[2], f02;
 
     g = g1_mw(2, position_dim[0], position, i);
 
-    f0 = g*position[i*position_dim[0]+0];
-    f1 = g*(1-pow((fitness[i*3+0]/g), 0.6));
+    f[0] = g*position[i*position_dim[0]+0];
+    f[1] = g*(1-pow((f[0]/g), 0.6));
 
-    fitness[i*3+0] =  f0;
-    fitness[i*3+1] =  f1;
+    fitness[i*3+0] =  f[0];
+    fitness[i*3+1] =  f[1];
 
-    T[0] = f0*f0;
+    f02 = pow(f[0],2);
+
+    T[0] = f02;
     T[0] *= -0.64;
-    T[0] -= f1;
+    T[0] -= f[1];
     T[0] += 1;
-    T[1] = f0*f0;
+    T[1] = f02;
     T[1] *= -0.36;
-    T[1] -= f1;
+    T[1] -= f[1];
     T[1] += 1;
     T[0] = T[0]*T[1];
 
-    T[1] = f0 + 0.35;
+    T[1] = f[0] + 0.35;
     T[1] *= T[1];
     T[1] *= -1;
-    T[1] -= f1;
+    T[1] -= f[1];
     T[1] += pow(1.35, 2);
 
-    T[2] = f0 + 0.15;
+    T[2] = f[0] + 0.15;
     T[2] *= T[2];
     T[2] *= -1;
-    T[2] -= f1;
+    T[2] -= f[1];
     T[2] += pow(1.15, 2);
 
     T[1] *= T[2];
@@ -892,46 +894,48 @@ double *alpha)
 
 __device__ void mw10(double *position, int *position_dim, double *fitness, int i, double *alpha)
 {
-    double g=0, c[3], temp, f0, f1;
+    double g=0, temp[2], f[2], f02;
 
     g = g2_mw(2, position_dim[0], position, i);
 
-    f0 = g*pow(position[i*position_dim[0]+0], position_dim[0]);
-    f1 = g*(1-pow((fitness[i*5+0]/g), 2));
+    f[0] = g*pow(position[i*position_dim[0]+0], position_dim[0]);
+    f[1] = g*(1.0-pow(f[0]/g, 2));
 
-    fitness[i*5+0] =  f0;
-    fitness[i*5+1] =  f1;
+    fitness[i*5+0] =  f[0];
+    fitness[i*5+1] =  f[1];
 
-    c[0] = pow(f0, 2);
-    c[0] *= -4;
-    c[0] -= f1;
-    c[0] += 2;
-    temp = pow(f0,2);
-    temp *= -8;
-    temp -= f1;
-    temp += 2;
-    c[0] *= temp;
-    fitness[i*5+2] = -1*c[0];
+    f02 = f[0]*f[0];
 
-    c[1] = pow(f0, 2);
-    c[1] *= -2;
-    c[1] -= f1;
-    c[1] += 2;
-    temp = pow(f0, 2);
-    temp *= -16;
-    temp -= f1;
-    temp += 2;
-    fitness[i*5+3] = c[1] * temp;
+    temp[0] = f02;
+    temp[0] *= -4;
+    temp[0] -= f[1];
+    temp[0] += 2;
+    temp[1] = f02;
+    temp[1] *= -8;
+    temp[1] -= f[1];
+    temp[1] += 2;
+    temp[0] *= temp[1];
+    fitness[i*5+2] = -1*temp[0];
 
-    c[2] = pow(f0, 2);
-    c[2] *= -1;
-    c[2] -= f1;
-    c[2] += 1;
-    temp = pow(f0, 2);;
-    temp *= -1.2;
-    temp -= f1;
-    temp += 1.2;
-    fitness[i*5+4] = c[2] = temp;
+    temp[0] = f02;
+    temp[0] *= -2;
+    temp[0] -= f[1];
+    temp[0] += 2;
+    temp[1] = f02;
+    temp[1] *= -16;
+    temp[1] -= f[1];
+    temp[1] += 2;
+    fitness[i*5+3] = temp[0] * temp[1];
+
+    temp[0] = f02;
+    temp[0] *= -1;
+    temp[0] -= f[1];
+    temp[0] += 1;
+    temp[1] = f02;
+    temp[1] *= -1.2;
+    temp[1] -= f[1];
+    temp[1] += 1.2;
+    fitness[i*5+4] = temp[0] * temp[1];
 }
 
 __device__ void mw11(double *position, int *position_dim, double *fitness, int i)
@@ -1357,7 +1361,7 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
 {
     int obj_dim = dim[2];
     int total_dim = dim[0];
-    double tol = 1e-3;
+    double tol = 1e-4;
 
     int inviavel1 = 0, inviavel2 = 0;
     double violacao_total1 = 0.0, violacao_total2 = 0.0;
@@ -1404,11 +1408,11 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
     for (int i = 0; i < obj_dim; i++) {
 //         se minimzacao
         if (maximize[i] == 0) {
-            if (fitness1[i] > fitness2[i]) return 0;
-            if (fitness1[i] < fitness2[i]) domina = 1;
+            if (fitness1[i] > fitness2[i]+tol) return 0;
+            if (fitness1[i]+tol < fitness2[i]) domina = 1;
         } else {
-            if (fitness1[i] < fitness2[i]) return 0;
-            if (fitness1[i] > fitness2[i]) domina = 1;
+            if (fitness1[i]+tol < fitness2[i]) return 0;
+            if (fitness1[i] > fitness2[i]+tol) domina = 1;
         }
     }
 
