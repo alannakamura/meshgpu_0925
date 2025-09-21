@@ -636,7 +636,7 @@ __device__ double g2_mw(int m, int n, double *position, int i)
 
 __device__ double g3_mw(int m, int n, double *position, int i)
 {
-    double g3, temp;
+    double g3=0, temp;
     int j;
 
     for(j=m-1;j<n;j++)
