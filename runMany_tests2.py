@@ -15,8 +15,8 @@ for j in range(len(problem)):
     GPU = cuda.Device(0).name().split()
     GPU = '_'.join(GPU[3:])
 
-    num = 200
-    iterations = 100
+    num = 300
+    iterations = 30
     population = 128
     pos_dim = 3
     f = open('results.pkl', 'wb')
