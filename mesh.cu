@@ -1594,8 +1594,8 @@ __global__ void fast_nondominated_sort2_copy(int *domination_counter, int *popul
     }
 }
 
-__global__ void fast_nondominated_sort3(int *domination_counter, int *population_size,
- int *fronts, int *tam, int *rank)
+__global__ void fast_nondominated_sort3(int *domination_counter, int *population_size, int *fronts, int *tam,
+ int *rank)
 {
     int i, j2=0, k = 0, rank_count = 0;
     int tamP = 0;
@@ -1648,9 +1648,7 @@ __global__ void fast_nondominated_sort3(int *domination_counter, int *population
 __global__ void fast_nondominated_sort3_copy(int *domination_counter, int *population_size,
  int *fronts, int *tam, int *rank)
 {
-    int i, j2=0, k = 0, rank_count = 0;
-    int tamP = 0;
-    int inicioFrontAnterior;
+    int i, j2=0, k = 0, rank_count = 0, tamP = 0, inicioFrontAnterior, control, l;
 
     for(i=0;i<2*population_size[0];i++)
     {
@@ -1667,11 +1665,15 @@ __global__ void fast_nondominated_sort3_copy(int *domination_counter, int *popul
     tam[k] = tamP;
     k += 1;
 
+//     printf("i = %d ok1\n", i);
+
     while(j2<2*population_size[0])
     {
         rank_count +=1 ;
         tamP = 0;
         inicioFrontAnterior = j2-tam[k-1];
+        control = 0;
+
         for(i=0;i<2*population_size[0];i++)
         {
             for(int j=0;j<tam[k-1];j++)
@@ -1688,13 +1690,135 @@ __global__ void fast_nondominated_sort3_copy(int *domination_counter, int *popul
                 rank[i] = rank_count;
                 j2+=1;
                 tamP+=1;
+                control = 1;
             }
         }
-        tam[k] = tamP;
-        k+=1;
+        if(k>=383)
+        {
+            for(l=0;l<384;l++)
+            {
+                printf("%d ", tam[l]);
+            }
+            printf("\n");
+        }
+        if(control < 2)
+        {
+            tam[k] = tamP;
+            k+=1;
+        }
     }
     tam[k] = -1;
 }
+
+__global__ void fast_nondominated_sort3_debug(int *domination_counter, int *population_size,
+                                             int *fronts, int *tam, int *rank)
+{
+    int i, j2 = 0, k = 0, rank_count = 0;
+    int tamP = 0;
+    int inicioFrontAnterior;
+
+    int max_index = 3 * population_size[0];  // tamanho máximo de fronts/rank
+    int max_dom_counter = (2 * population_size[0] + 1) * (2 * population_size[0] + 1);  // tamanho domination_counter
+
+    // Loop inicial
+    for(i = 0; i < 2 * population_size[0]; i++)
+    {
+        int idx = 2*population_size[0]*2*population_size[0] + i;
+        if(idx >= max_dom_counter) {
+            printf("ERRO: domination_counter fora do limite! idx=%d, i=%d, j2=%d\n", idx, i, j2);
+            return;
+        }
+
+        if(domination_counter[idx] == 0)
+        {
+            domination_counter[idx] = -1;
+
+            if(j2 >= max_index) {
+                printf("ERRO: fronts fora do limite! j2=%d, i=%d\n", j2, i);
+                return;
+            }
+            fronts[j2] = i;
+
+            if(i >= max_index) {
+                printf("ERRO: rank fora do limite! i=%d\n", i);
+                return;
+            }
+            rank[i] = rank_count;
+
+            tamP += 1;
+            j2 += 1;
+        }
+    }
+
+    tam[k] = tamP;
+    k += 1;
+
+    // Loop principal de nondominated sort
+    while(j2 < 2*population_size[0])
+    {
+        rank_count += 1;
+        tamP = 0;
+        inicioFrontAnterior = j2 - tam[k-1];
+
+        for(i = 0; i < 2*population_size[0]; i++)
+        {
+            for(int j = 0; j < tam[k-1]; j++)
+            {
+                int idx2 = fronts[inicioFrontAnterior+j]*2*population_size[0] + i;
+                if(idx2 >= max_dom_counter) {
+                    printf("ERRO: domination_counter derivado fora do limite! idx2=%d, i=%d, j=%d\n", idx2, i, j);
+                    return;
+                }
+
+                if(domination_counter[idx2] == 1) {
+                    int idx3 = 2*population_size[0]*2*population_size[0] + i;
+                    if(idx3 >= max_dom_counter) {
+                        printf("ERRO: domination_counter principal fora do limite! idx3=%d, i=%d\n", idx3, i);
+                        return;
+                    }
+                    domination_counter[idx3] -= 1;
+                }
+            }
+
+            int idx4 = 2*population_size[0]*2*population_size[0] + i;
+            if(idx4 >= max_dom_counter) {
+                printf("ERRO: domination_counter final fora do limite! idx4=%d, i=%d\n", idx4, i);
+                return;
+            }
+
+            if(domination_counter[idx4] == 0)
+            {
+                domination_counter[idx4] = -1;
+
+                if(j2 >= max_index) {
+                    printf("ERRO: fronts fora do limite! j2=%d, i=%d\n", j2, i);
+                    return;
+                }
+                fronts[j2] = i;
+
+                if(i >= max_index) {
+                    printf("ERRO: rank fora do limite! i=%d\n", i);
+                    return;
+                }
+                rank[i] = rank_count;
+
+                j2 += 1;
+                tamP += 1;
+            }
+        }
+
+        if(k >= max_index) {
+            printf("ERRO: tam fora do limite! k=%d\n", k);
+            return;
+        }
+        tam[k] = tamP;
+        k += 1;
+    }
+
+    if(k < max_index)
+        tam[k] = -1;
+}
+
 
 __global__ void fast_nondominated_sort4(double *fitness, int *dim, int *domination_counter,
 int *colunas, int *minimization, int *dim_fit, int *front0_mem, int *tam_front0_mem)

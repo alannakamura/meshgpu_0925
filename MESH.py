@@ -331,10 +331,15 @@ class MESH:
             cuda.memcpy_htod(self.domination_counter_g,
                              np.zeros((total+1) * (total+1), dtype=np.int32))
 
+            # self.fronts_g = (
+            #     cuda.mem_alloc(np.zeros(2 * self.params.population_size, dtype=np.int32).nbytes))
+            # cuda.memcpy_htod(self.fronts_g,
+            #                  np.zeros(2 * self.params.population_size, dtype=np.int32))
+
             self.fronts_g = (
-                cuda.mem_alloc(np.zeros(2 * self.params.population_size, dtype=np.int32).nbytes))
+                cuda.mem_alloc(np.zeros(total, dtype=np.int32).nbytes))
             cuda.memcpy_htod(self.fronts_g,
-                             np.zeros(2 * self.params.population_size, dtype=np.int32))
+                             np.zeros(total, dtype=np.int32))
 
             self.front0_mem_g = (
                 cuda.mem_alloc(np.zeros(2*self.params.population_size + self.params.memory_size,
@@ -347,10 +352,15 @@ class MESH:
                 cuda.mem_alloc(np.zeros(1, dtype=np.int32).nbytes))
             cuda.memcpy_htod(self.tam_front0_mem_g, np.zeros(1, dtype=np.int32))
 
+            # self.tams_fronts_g = (
+            #     cuda.mem_alloc(np.zeros(2 * self.params.population_size, dtype=np.int32).nbytes))
+            # cuda.memcpy_htod(self.tams_fronts_g,
+            #                  np.zeros(2 * self.params.population_size, dtype=np.int32))
+
             self.tams_fronts_g = (
-                cuda.mem_alloc(np.zeros(2 * self.params.population_size, dtype=np.int32).nbytes))
+                cuda.mem_alloc(np.zeros(total, dtype=np.int32).nbytes))
             cuda.memcpy_htod(self.tams_fronts_g,
-                             np.zeros(2 * self.params.population_size, dtype=np.int32))
+                             np.zeros(total, dtype=np.int32))
 
             self.crowding_distance_g = (
                 cuda.mem_alloc(np.zeros(total, dtype=np.float64).nbytes))
@@ -2290,10 +2300,16 @@ class MESH:
                     cuda.Context.synchronize()
 
                     fast_nondominated_sort3 = self.mod.get_function("fast_nondominated_sort3_copy")
+                    # fast_nondominated_sort3 = self.mod.get_function("fast_nondominated_sort3_debug")
                     fast_nondominated_sort3(self.domination_counter_g, self.params.population_size_g,
                                             self.fronts_g, self.tams_fronts_g,
                                             self.rank_g,
                                             block=(1, 1, 1), grid=(1, 1, 1))
+
+                    # teste2 = np.zeros(384, dtype=np.int32)
+                    # cuda.memcpy_dtoh(teste2, self.tams_fronts_g)
+                    # print(teste2)
+
                     cuda.Context.synchronize()
 
                 gpu[6] += (dt.now() - start).total_seconds()
