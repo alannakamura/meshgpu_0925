@@ -3,11 +3,11 @@ from tqdm import tqdm
 import os
 import pycuda.driver as cuda
 
-problem = [34]
+problem = [31]
 #problem = [32,33,34,35,36,37,38,39,310,311,312,313,314]
 # problem = [11,12,13,14,16]
 # problem = [4,7,1,2,3,5,6]
-#problem = [31, 32, 33, 35, 36, 37]
+#problem = [31, 32, 33, 35, 36, 37]yy
 for j in range(len(problem)):
     print('problem', problem[j])
 
@@ -16,7 +16,7 @@ for j in range(len(problem)):
     GPU = '_'.join(GPU[3:])
 
     num = 100
-    iterations = 100
+    iterations = 30
     population = 128
     pos_dim = 3
     f = open('results.pkl', 'wb')
