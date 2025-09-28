@@ -1361,7 +1361,8 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
 {
     int obj_dim = dim[2];
     int total_dim = dim[0];
-    double tol = 1e-4;
+//     double tol = 1e-4;
+    double tol = 0.0;
 
     int inviavel1 = 0, inviavel2 = 0;
     double violacao_total1 = 0.0, violacao_total2 = 0.0;
@@ -1648,7 +1649,8 @@ __global__ void fast_nondominated_sort3(int *domination_counter, int *population
 __global__ void fast_nondominated_sort3_copy(int *domination_counter, int *population_size,
  int *fronts, int *tam, int *rank)
 {
-    int i, j2=0, k = 0, rank_count = 0, tamP = 0, inicioFrontAnterior, control, l;
+    int i, j2=0, k = 0, rank_count = 0, tamP = 0, inicioFrontAnterior, control;
+//     int l;
 
     for(i=0;i<2*population_size[0];i++)
     {
@@ -1669,10 +1671,10 @@ __global__ void fast_nondominated_sort3_copy(int *domination_counter, int *popul
 
     while(j2<2*population_size[0])
     {
-        rank_count +=1 ;
+        rank_count +=1;
         tamP = 0;
         inicioFrontAnterior = j2-tam[k-1];
-        control = 0;
+//         control = 0;
 
         for(i=0;i<2*population_size[0];i++)
         {
@@ -1695,16 +1697,18 @@ __global__ void fast_nondominated_sort3_copy(int *domination_counter, int *popul
         }
         if(k>=383)
         {
-            for(l=0;l<384;l++)
-            {
-                printf("%d ", tam[l]);
-            }
-            printf("\n");
+//             for(l=0;l<384;l++)
+//             {
+//                 printf("%d ", tam[l]);
+//             }
+//             printf("\n");
+            printf("estourou\n");
         }
-        if(control < 2)
+        if(control == 1)
         {
             tam[k] = tamP;
             k+=1;
+            control = 0;
         }
     }
     tam[k] = -1;
