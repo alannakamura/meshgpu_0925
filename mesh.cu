@@ -1362,7 +1362,7 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
     int obj_dim = dim[2];
     int total_dim = dim[0];
 //     double tol = 1e-4;
-    double tol = 0.0;
+    double tol1 = 1e-4, tol2 = 0.0;
 
     int inviavel1 = 0, inviavel2 = 0;
     double violacao_total1 = 0.0, violacao_total2 = 0.0;
@@ -1370,7 +1370,7 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
     // Verifica restrições: positiva → inviável
     for (int j = obj_dim; j < total_dim; j++) {
 //         if (fitness1[j] > 0.0)
-    if (fitness1[j] > tol)
+    if (fitness1[j] > tol1)
         {
             inviavel1 = 1;
             break;
@@ -1379,7 +1379,7 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
 
     for (int j = obj_dim; j < total_dim; j++) {
 //         if(fitness2[j] > 0.0)
-        if(fitness2[j] > tol)
+        if(fitness2[j] > tol1)
         {
             inviavel2 = 1;
             break;
@@ -1398,8 +1398,8 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
         {
 //             if (fitness1[j] > 0.0) violacao_total1 += fitness1[j];
 //             if (fitness2[j] > 0.0) violacao_total2 += fitness2[j];
-            if (fitness1[j] > tol) violacao_total1 += fitness1[j];
-            if (fitness2[j] > tol) violacao_total2 += fitness2[j];
+            if (fitness1[j] > tol2) violacao_total1 += fitness1[j];
+            if (fitness2[j] > tol2) violacao_total2 += fitness2[j];
         }
         return (violacao_total1 < violacao_total2) ? 1 : 0;
     }
@@ -1409,11 +1409,11 @@ __device__ int a_dominate_b(double *fitness1, double *fitness2, int *dim, int *m
     for (int i = 0; i < obj_dim; i++) {
 //         se minimzacao
         if (maximize[i] == 0) {
-            if (fitness1[i] > fitness2[i]+tol) return 0;
-            if (fitness1[i]+tol < fitness2[i]) domina = 1;
+            if (fitness1[i] > fitness2[i]+tol2) return 0;
+            if (fitness1[i]+tol2 < fitness2[i]) domina = 1;
         } else {
-            if (fitness1[i]+tol < fitness2[i]) return 0;
-            if (fitness1[i] > fitness2[i]+tol) domina = 1;
+            if (fitness1[i]+tol2 < fitness2[i]) return 0;
+            if (fitness1[i] > fitness2[i]+tol2) domina = 1;
         }
     }
 
