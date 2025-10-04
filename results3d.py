@@ -14,7 +14,7 @@ import datetime as dt
 # name_file = 'testes/220725/versao1/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'testes/220725/versao2/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'results_1_10sim_50iter_256pop_3posdim_1.0alpha_3060.pkl'
-name_file = 'results_34_100sim_30iter_128pop_3posdim_5070.pkl'
+name_file = 'result/031025/results_314_100sim_30iter_128pop_3posdim_5070.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
@@ -73,7 +73,7 @@ y = max(y, y2)
 z = max(z, z2)
 # ref = [x, y, z]
 ref = [2]*3
-# ref[2] = 7
+ref[2] = 7
 # ref = [60] * 3 #dtlz1
 # ref = [91] * 3 #dtlz3
 
