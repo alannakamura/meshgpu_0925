@@ -9,7 +9,7 @@ from optimisationMap import *
 import pickle
 
 # name_file = 'results.p
-name_file = 'results_313_200sim_30iter_128pop_3posdim_5070.pkl'
+name_file = 'result/031025/results_314_100sim_30iter_128pop_3posdim_5070.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
@@ -65,8 +65,8 @@ x2 = np.max(pf_a[:, 0]) + 0.1
 y2 = np.max(pf_a[:, 1]) + 0.1
 x = float(max(x, x2))
 y = float(max(y, y2))
-ref = [x, y]
-# ref = [2]*2
+# ref = [x, y]
+ref = [2]*2
 
 print('ref', ref)
 
@@ -93,11 +93,11 @@ plt.plot(fit[:, 0], fit[:, 1], 'ro')
 plt.title(name_problem.upper()+ ' MESH GPU')
 plt.show()
 
-hv = hypervolume(pf_a)
-print('hypervolume_paretto', hv.compute(ref))
-
 hv2 = hypervolume(fit)
 print('hypervolume_gpu', hv2.compute(ref))
+
+hv = hypervolume(pf_a)
+print('hypervolume_paretto', hv.compute(ref))
 
 gpu_pareto = abs(hv.compute(ref) - hv2.compute(ref))
 print('hypervolume_gpu_pareto', gpu_pareto)

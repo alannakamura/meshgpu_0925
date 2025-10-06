@@ -7,13 +7,14 @@ from pymoo.visualization.scatter import Scatter
 import numpy as np
 import pandas as pd
 from optimisationMap import *
+import datetime as dt
 
 # name_file = 'results.pkl'
 # name_file = 'results_1_100sim_30iter_128pop_3posdim_1.0alpha_3060_1.pkl'
 # name_file = 'testes/220725/versao1/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'testes/220725/versao2/results_2_100sim_30iter_128pop_3posdim_1.0alpha_3060.pkl'
 # name_file = 'results_1_10sim_50iter_256pop_3posdim_1.0alpha_3060.pkl'
-name_file = 'results_38_100sim_30iter_128pop_3posdim_5070.pkl'
+name_file = 'result/031025/results_314_100sim_30iter_128pop_3posdim_5070.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
@@ -26,7 +27,7 @@ sim = int(name_file.split('_')[2][:-3])
 tam_pop = int(name_file.split('_')[4][:-3])
 print('sim', sim, 'tam_pop', tam_pop, 'pos_dim', pos_dim, 'name_problem', name_problem)
 
-problem = get_problem(name_problem)
+problem = get_problem(name_problem, n_var=3)
 
 if name_problem in ['dtlz1', 'dtlz2', 'dtlz3', 'dtlz4']:
     ref_dirs = get_reference_directions("das-dennis", 3, n_partitions=100)
@@ -70,19 +71,19 @@ z2 = np.max(pf_a[:, 2]) + 0.1
 x = max(x, x2)
 y = max(y, y2)
 z = max(z, z2)
-ref = [x, y, z]
-# ref = [2]*3
-# ref[2] = 7
+# ref = [x, y, z]
+ref = [2]*3
+ref[2] = 7
 # ref = [60] * 3 #dtlz1
 # ref = [91] * 3 #dtlz3
 
 print('ref', ref)
 
-hv = hypervolume(pf_a)
-print('hypervolume_paretto', hv.compute(ref))
-
 hv2 = hypervolume(fit)
 print('hypervolume_mesh', hv2.compute(ref))
+
+hv = hypervolume(pf_a)
+print('hypervolume_paretto', hv.compute(ref))
 
 # hv3 = hypervolume(res2)
 # print('hypervolume_nsga2', hv3.compute(ref))
@@ -170,20 +171,25 @@ s = Scatter(angle=(20, 20), title = name_problem.upper()+' MESH GPU')
 s.add(fit, color='red')
 s.show()
 
-gpu = results['gpu']
+# gpu = results['gpu']
+# plt.figure()
+# plt.title(name_problem.upper()+' GPU TIMES')
+# df = pd.DataFrame(gpu)
+# df.boxplot()
+# print('GPU\n', df.describe())
+# plt.show()
+
+gpu = results['gpu2']
 plt.figure()
 plt.title(name_problem.upper()+' GPU TIMES')
 df = pd.DataFrame(gpu)
 df.boxplot()
 print('GPU\n', df.describe())
-plt.show()
 
-gpu2 = results['gpu2']
-plt.figure()
-plt.title(name_problem.upper()+' GPU2 TIMES')
-df = pd.DataFrame(gpu2)
-df.boxplot()
-print('GPU\n', df.describe())
+print(problem)
+print('total time in GPU: ', sum(gpu))
+print('total time in GPU: ', str(dt.timedelta(seconds=sum(gpu)))[:-7])
+
 plt.show()
 
 print(problem)
