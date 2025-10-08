@@ -9,7 +9,7 @@ import pandas as pd
 from optimisationMap import *
 import datetime as dt
 
-name_file = 'result/031025/results_4_300sim_30iter_128pop_3posdim_5070.pkl'
+name_file = 'result/031025/results_4_100sim_200iter_128pop_3posdim_5070.pkl'
 
 f = open(name_file, 'rb')
 results = pickle.load(f)
